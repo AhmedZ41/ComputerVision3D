@@ -33,6 +33,10 @@
 #include "Axes.h"
 #include "Plane.h"
 #include "PointCloud.h"
+#include "Cube.h"
+#include "PerspectiveCamera.h"
+
+
 
 using namespace std;
 using namespace Qt;
@@ -49,17 +53,27 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
 
     // setup the scene
     sceneManager.push_back(new Axes(E0,QMatrix4x4()));    // the global world coordinate system
-    sceneManager.push_back(new Plane(E0+4*E3,-E3));       // some plane
+   // sceneManager.push_back(new Plane(E0+4*E3,-E3));       // some plane
 
     // TODO: Assignment 1, Part 1
     //       Add here your own new 3d scene objects, e.g. cubes, hexahedra, etc.,
     //       analog to line 50 above and the respective Axes-class
     //
+    sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + E2, 1.0f));
+    sceneManager.push_back(new Cube(E0 + 7*E3 + E1 + -1*E2, .5f));
+    sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + -1*E2, .3f));
+
 
     // TODO: Assignement 1, Part 2
     //       Add here your own new scene object that represents a perspective camera.
-    //       Its draw-method should draw all relevant camera parameters, e.g. image plane, view axes, etc.
+    //       Its draw-method should draw all relevant camera parameters, e.g. image plane, view axes, etc
     //
+sceneManager.push_back(
+    new PerspectiveCamera(E0+2*E3,        // camera position
+                          QVector3D(0, 0, -1), // looking down -z
+                          QVector3D(0, 1, 0),  // up direction
+                          2.0f,                // focal length
+                          1.0f, 0.75f));       // image plane size
 
     // TODO: Assignement 1, Part 3
     //       Add to your perspective camera methods to project the other scene objects onto its image plane

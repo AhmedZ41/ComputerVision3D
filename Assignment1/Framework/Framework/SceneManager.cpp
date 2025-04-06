@@ -27,9 +27,16 @@ void SceneManager::draw(const RenderCamera& renderer, const QColor& color) const
         case ST_POINT_CLOUD:
             obj->draw(renderer,COLOR_POINT_CLOUD,3.0f);     // last argument unused
             break;
+
+
         case ST_PERSPECTIVE_CAMERA:
+            obj->draw(renderer, COLOR_CAMERA, 2.0f);
+            break;
             // TODO: Assignement 1, Part 3
             // This is the place to invoke the perspective camera's projection method and draw the projected objects.
+
+
+
            break;
         case ST_STEREO_CAMERA:
             // TODO: Assignement 2, Part 1 - 3
