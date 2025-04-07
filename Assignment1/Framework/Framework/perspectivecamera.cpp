@@ -112,8 +112,9 @@ void PerspectiveCamera::computeCameraCoordinateSystem()
     QMatrix4x4 R;
     R.setColumn(0, to4D(rightVector));     // x_cam
     R.setColumn(1, to4D(upVector));        // y_cam
-    R.setColumn(2, to4D(-viewDirection));  // z_cam (looking into -z)
-    R.setColumn(3, QVector4D(0, 0, 0, 1)); // Homogeneous identity
+    R.setColumn(2, to4D(-viewDirection));  // z_cam, looking into -z
+    R.setColumn(3, QVector4D(0, 0, 0, 1));
+
 
     // Translation to camera position
     QMatrix4x4 T;
