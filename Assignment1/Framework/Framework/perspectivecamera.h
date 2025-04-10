@@ -3,6 +3,8 @@
 #include "SceneObject.h"
 #include "Axes.h"
 #include "Plane.h"
+class Cube;  // 👈 Forward declaration
+
 
 class PerspectiveCamera : public SceneObject {
 private:
@@ -22,6 +24,11 @@ private:
     QMatrix4x4 cameraToWorld;       // Transformation matrix from camera space to world space
     Axes* localAxes;                // Coordinate axes (for visualizing camera orientation)
     Plane* imagePlane;              // A quad representing the image plane
+    std::vector<std::array<QVector4D, 8>> projectedObjects; // Stores projected cubes
+
+    // Projection helper
+    std::optional<std::array<QVector4D, 8>> projectCube(const std::array<QVector4D, 8>& cubePoints);
+
 
 public:
     // ===== Constructor =====
@@ -44,8 +51,12 @@ public:
     QVector4D getPrincipalPoint() const { return principalPoint; }
 
     // TODO (Part 3): Method to project 3D points to image plane
+    void addCube(const Cube& cube); // Register a cube for projection
+
 
 private:
     // Helper to update cameraToWorld and derived members
     void computeCameraCoordinateSystem();
+
+
 };

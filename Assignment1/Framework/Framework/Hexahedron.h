@@ -17,6 +17,13 @@ protected:
     float dx, dy, dz;                           // dy = width, dy = height, dz = thickness/depth
 
 public:
+    std::array<QVector4D, 8> getPoints() const {
+        std::array<QVector4D, 8> result;
+        for (int i = 0; i < 8; ++i) {
+            result[i] = QVector4D(this->at(i), 1.0f); // Convert from QVector3D to 4D
+        }
+        return result;
+    }
     Hexahedron(QVector4D _ori = E0+E1,          // origin in homogeneous coordinates, i.e. typically it's the bottom-left-front corner
                float     _dx  = 1.0,            // width
                float     _dy  = 1.0,            // height

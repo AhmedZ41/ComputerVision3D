@@ -10,7 +10,7 @@
 Axes::Axes(const QVector4D&  _origin,
            const QMatrix4x4& _rotation)
     : rotation(_rotation),
-      origin  (_origin)
+    origin  (_origin)
 {
     type = SceneObjectType::ST_AXES;
     axes.push_back(QVector3D(origin));

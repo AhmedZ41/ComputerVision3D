@@ -53,32 +53,44 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
 
     // setup the scene
     sceneManager.push_back(new Axes(E0,QMatrix4x4()));    // the global world coordinate system
-   // sceneManager.push_back(new Plane(E0+4*E3,-E3));       // some plane
+    // sceneManager.push_back(new Plane(E0+4*E3,-E3));       // some plane
 
     // TODO: Assignment 1, Part 1
     //       Add here your own new 3d scene objects, e.g. cubes, hexahedra, etc.,
     //       analog to line 50 above and the respective Axes-class
     //
-    sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + E2, 1.0f));
-    sceneManager.push_back(new Cube(E0 + 7*E3 + E1 + -1*E2, .5f));
-    sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + -1*E2, .3f));
+    sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + E2, .5f));
+    sceneManager.push_back(new Cube(E0 + 9*E3 + -E1 + 1*E2, .5f));
+    sceneManager.push_back(new Cube(E0 + 5*E3 + -E1 + -0.5*E2, .5f));
+
 
 
     // TODO: Assignement 1, Part 2
     //       Add here your own new scene object that represents a perspective camera.
     //       Its draw-method should draw all relevant camera parameters, e.g. image plane, view axes, etc
+
     //
-sceneManager.push_back(
-    new PerspectiveCamera(E0+2*E3,        // camera position
-                          QVector3D(0, 0, -1), // looking down -z
-                          QVector3D(0, 1, 0),  // up direction
-                          2.0f,                // focal length
-                          1.0f, 0.75f));       // image plane size
+    auto cam = new PerspectiveCamera(E0 + 2*E3,
+                                     QVector3D(0, 0, -1),
+                                     QVector3D(0, 1, 0),
+                                     2.0f,
+                                     2.0f, 1.5f);
+
+    sceneManager.push_back(cam);
 
     // TODO: Assignement 1, Part 3
     //       Add to your perspective camera methods to project the other scene objects onto its image plane
     //       and to draw the projected objects. These methods have to be invoked in Scene.cpp/Scene::draw.
     //
+
+
+    // Add all existing cubes to camera for projection
+    for (auto s : sceneManager) {
+        if (s->getType() == SceneObjectType::ST_CUBE) {
+            cam->addCube(*reinterpret_cast<Cube*>(s));
+        }
+    }
+
 
     // TODO: Assignement 2, Part 1 - 3
     //       Add here your own new scene object that represents a stereo camera pair.
@@ -103,14 +115,14 @@ GLWidget::~GLWidget()
 //
 void GLWidget::initializeGL()
 {
-      // ensure GL flags
-      glEnable(GL_POINT_SMOOTH);
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glClearColor(0.4f,0.4f,0.4f,1);                       // screen background color
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glEnable(GL_DEPTH_TEST);
-      glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);               //required for gl_PointSize
+    // ensure GL flags
+    glEnable(GL_POINT_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glClearColor(0.4f,0.4f,0.4f,1);                       // screen background color
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);               //required for gl_PointSize
 }
 
 //
@@ -152,10 +164,10 @@ void GLWidget::keyReleaseEvent(QKeyEvent * event)
     switch ( event->key() )
     {
         // release renderer's axis of rotation
-      case Key_X: X_Pressed=false; break;
-      case Key_Y: Y_Pressed=false; break;
+    case Key_X: X_Pressed=false; break;
+    case Key_Y: Y_Pressed=false; break;
         // for unhandled events, call keyReleaseEvent of parent class
-      default: QWidget::keyReleaseEvent(event); break;
+    default: QWidget::keyReleaseEvent(event); break;
     }
     update();
 }
@@ -191,7 +203,7 @@ void GLWidget::keyPressEvent(QKeyEvent * event)
         for (auto s: sceneManager) if (s->getType()==SceneObjectType::ST_POINT_CLOUD) s->affineMap(A);
         break;
     }
-        // quit application
+    // quit application
     case Key_Q:
     case Key_Escape: QApplication::instance()->quit(); break;
         // for unhandled events call keyPressEvent of parent class
@@ -255,14 +267,14 @@ void GLWidget::openFileDialog()
 
     if (!filePath.isEmpty() && pointCloud)
     {
-         cout << filePath.toStdString() << endl;
-         pointCloud->loadPLY(filePath);
-         pointCloud->setPointSize(unsigned(pointSize));
-         sceneManager.push_back(pointCloud);
-         update();
-         return;
-     }
-     delete pointCloud;
+        cout << filePath.toStdString() << endl;
+        pointCloud->loadPLY(filePath);
+        pointCloud->setPointSize(unsigned(pointSize));
+        sceneManager.push_back(pointCloud);
+        update();
+        return;
+    }
+    delete pointCloud;
 }
 
 //
@@ -273,10 +285,10 @@ void GLWidget::radioButtonClicked()
     // TODO: toggle to
     QMessageBox::warning(this, "Feature" ,"Some things are missing here. Implement yourself, if necessary.");
     if (sender()) {
-       QString      name = sender()->objectName();
-       if (name=="radioButton_1") {};
-       if (name=="radioButton_2") {};
-       update();
+        QString      name = sender()->objectName();
+        if (name=="radioButton_1") {};
+        if (name=="radioButton_2") {};
+        update();
     }
 }
 
@@ -295,4 +307,3 @@ void GLWidget::spinBoxValueChanged(int)
 {
     QMessageBox::warning(this, "Feature" ,"ups hier fehlt noch was");
 }
-

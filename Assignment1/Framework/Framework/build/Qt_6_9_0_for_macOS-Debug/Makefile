@@ -1872,6 +1872,8 @@ debug/perspectivecamera.o: ../../perspectivecamera.cpp ../../PerspectiveCamera.h
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtCore.framework/Headers/qobject.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector3D \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvectornd.h \
+		../../Axes.h \
+		../../Plane.h \
 		../../GLConvenience.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QtGui \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtguiglobal.h \

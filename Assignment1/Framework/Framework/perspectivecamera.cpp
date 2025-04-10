@@ -1,6 +1,8 @@
 #include "PerspectiveCamera.h"
 #include "GLConvenience.h"
 #include "QtConvenience.h"
+#include "Cube.h"  // Required to access Cube methods like getPoints()
+
 
 #include <cmath>
 
@@ -80,6 +82,21 @@ void PerspectiveCamera::draw(const RenderCamera& renderer,
     QVector3D bl = center - x - y;
 
     renderer.renderPlane(tl, tr, br, bl, QColor(255, 0, 0), 0.3f); // transparent red
+
+    // Draw all projected cubes on the image plane
+    std::array<std::array<int, 2>, 12> edges = {{
+        {0,1}, {1,2}, {2,3}, {3,0},
+        {4,5}, {5,6}, {6,7}, {7,4},
+        {0,4}, {1,5}, {2,6}, {3,7}
+    }};
+
+    for (const auto& cube : projectedObjects) {
+        for (const auto& edge : edges) {
+            renderer.renderLine(cube[edge[0]], cube[edge[1]], QColor(0, 255, 0), 1.5f); // green
+        }
+    }
+
+
 }
 
 // Apply an affine transformation to the camera
@@ -124,3 +141,34 @@ void PerspectiveCamera::computeCameraCoordinateSystem()
     // Full camera-to-world matrix
     cameraToWorld = T * R;
 }
+
+std::optional<std::array<QVector4D, 8>> PerspectiveCamera::projectCube(const std::array<QVector4D, 8>& cubePoints) {
+    std::array<QVector4D, 8> projected;
+
+    for (int i = 0; i < 8; ++i) {
+        QVector4D P = cubePoints[i];           // 3D point on cube
+        QVector4D v = P - centerOfProjection;  // Vector from camera center to point
+        float denom = QVector3D::dotProduct(QVector3D(viewDirection), QVector3D(v));
+
+        if (std::abs(denom) < 1e-6f)
+            return std::nullopt;
+
+        float lambda = -QVector3D::dotProduct(QVector3D(viewDirection),
+                                              QVector3D(centerOfProjection - principalPoint)) / denom;
+
+        QVector4D projectedPoint = centerOfProjection + lambda * v;
+        projected[i] = projectedPoint;
+    }
+
+    return projected;
+}
+
+void PerspectiveCamera::addCube(const Cube& cube) {
+    auto cubePoints = cube.getPoints();  // Requires Cube::getPoints()
+    auto projection = projectCube(cubePoints);
+    if (projection.has_value()) {
+        projectedObjects.push_back(projection.value());
+    }
+}
+
+
