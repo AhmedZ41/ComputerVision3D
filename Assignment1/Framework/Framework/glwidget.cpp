@@ -62,6 +62,8 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + E2, .5f));
     sceneManager.push_back(new Cube(E0 + 9*E3 + -E1 + 1*E2, .5f));
     sceneManager.push_back(new Cube(E0 + 5*E3 + -E1 + -0.5*E2, .5f));
+    sceneManager.push_back(new Cube(E0 + 5*E3 + -5*E1 + -0.5*E2, .5f));
+
 
 
 
@@ -70,10 +72,10 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //       Its draw-method should draw all relevant camera parameters, e.g. image plane, view axes, etc
 
     //
-    auto cam = new PerspectiveCamera(E0 + 2*E3,
+    auto cam = new PerspectiveCamera(E0+E3,
                                      QVector3D(0, 0, -1),
                                      QVector3D(0, 1, 0),
-                                     2.0f,
+                                     1.0f,
                                      2.0f, 1.5f);
 
     sceneManager.push_back(cam);
