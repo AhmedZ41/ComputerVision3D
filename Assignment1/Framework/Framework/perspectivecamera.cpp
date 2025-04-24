@@ -32,7 +32,13 @@ PerspectiveCamera::PerspectiveCamera(const QVector4D& position,
     principalPoint = to4D(imagePlaneCenter);
 
     // Axes at camera origin (p 2 - Visualize local axes)
-    localAxes = new Axes(centerOfProjection, cameraToWorld);
+    QMatrix4x4 R;
+    R.setColumn(0, to4D(rightVector));
+    R.setColumn(1, to4D(upVector));
+    R.setColumn(2, to4D(-viewDirection));
+    R.setColumn(3, QVector4D(0, 0, 0, 1));
+
+    localAxes = new Axes(centerOfProjection, R);
 
     // Compute corners of image plane
     QVector3D x = rightVector * (imagePlaneWidth / 2.0f);

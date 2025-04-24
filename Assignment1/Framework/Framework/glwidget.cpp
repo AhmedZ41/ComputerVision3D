@@ -62,7 +62,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + E2, .5f));
     sceneManager.push_back(new Cube(E0 + 9*E3 + -E1 + 1*E2, .5f));
     sceneManager.push_back(new Cube(E0 + 5*E3 + -E1 + -0.5*E2, .5f));
-    sceneManager.push_back(new Cube(E0 + 5*E3 + -5*E1 + -0.5*E2, .5f));
+    //sceneManager.push_back(new Cube(E0 + 5*E3 + -5*E1 + -0.5*E2, .5f));
 
 
 
@@ -72,11 +72,11 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //       Its draw-method should draw all relevant camera parameters, e.g. image plane, view axes, etc
 
     //
-    auto cam = new PerspectiveCamera(E0+E3,
+    auto cam = new PerspectiveCamera(E0 + 2*E3,
                                      QVector3D(0, 0, -1),
                                      QVector3D(0, 1, 0),
-                                     1.0f,
-                                     2.0f, 1.5f);
+                                     2.0f,
+                                     1.5f, 1.5f);
 
     sceneManager.push_back(cam);
 
@@ -103,6 +103,15 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //       - Part 3: Its reconstruction method should reconstruct the 3d geometry of the other scene objects from misaligned stereo projections.
     //       - This has to be used in Scene.cpp/Scene::draw.
     //
+
+    auto cam2 = new PerspectiveCamera(
+        E0 + 4*E1 + 2*E3,          // shifted right a bit
+        QVector3D(0, 0, -1),         // same view direction
+        QVector3D(0, 1, 0),          // same up
+        2.0f,                        // same focal length
+        1.5f, 1.5f                   // same image plane size
+        );
+    sceneManager.push_back(cam2);   // Add to scene
 }
 
 //
