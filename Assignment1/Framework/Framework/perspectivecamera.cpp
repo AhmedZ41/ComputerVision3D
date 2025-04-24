@@ -100,9 +100,9 @@ void PerspectiveCamera::draw(const RenderCamera& renderer,
 
     for (const auto& cube : projectedObjects) {
         for (const auto& edge : edges) {
-            renderer.renderLine(cube[edge[0]], cube[edge[1]], QColor(255, 0, 0), 1.5f); // Green projected edges
+            //renderer.renderLine(cube[edge[0]], cube[edge[1]], QColor(255, 0, 0), 1.5f); // Green projected edges
             // Convert the 3D projected point into the image plane's local coordinate system
-            /*
+
             auto projectToImagePlane = [&](const QVector4D& p) -> QVector2D {
                 QVector3D vec = QVector3D(p) - QVector3D(principalPoint);
                 float u = QVector3D::dotProduct(vec, rightVector);
@@ -127,10 +127,10 @@ void PerspectiveCamera::draw(const RenderCamera& renderer,
                     };
 
                     if (isInside(uv1) || isInside(uv2)) {
-                        renderer.renderLine(p1, p2, QColor(0, 255, 0), 1.5f);
+                        renderer.renderLine(p1, p2, QColor(255, 0, 0), 1.5f);
                     }
                 }
-            }*/
+            }
 
         }
     }

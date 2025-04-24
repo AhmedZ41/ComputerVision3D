@@ -72,7 +72,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //       Its draw-method should draw all relevant camera parameters, e.g. image plane, view axes, etc
 
     //
-    auto cam = new PerspectiveCamera(E0 + 2*E3,
+    auto cam = new PerspectiveCamera(E0 + 2*E1+ 1*E3,
                                      QVector3D(0, 0, -1),
                                      QVector3D(0, 1, 0),
                                      2.0f,
@@ -105,14 +105,23 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //
 
     auto cam2 = new PerspectiveCamera(
-        E0 + 4*E1 + 2*E3,          // shifted right a bit
+        E0 + 1*E3,          // shifted right a bit
         QVector3D(0, 0, -1),         // same view direction
         QVector3D(0, 1, 0),          // same up
         2.0f,                        // same focal length
         1.5f, 1.5f                   // same image plane size
         );
     sceneManager.push_back(cam2);   // Add to scene
+
+    // Add all existing cubes to cam2 for projection
+    for (auto s : sceneManager) {
+        if (s->getType() == SceneObjectType::ST_CUBE) {
+            cam2->addCube(*reinterpret_cast<Cube*>(s));
+        }
+    }
+
 }
+
 
 //
 //  destructor has nothing to do, since it's under Qt control
