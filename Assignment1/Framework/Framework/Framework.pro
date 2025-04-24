@@ -34,6 +34,7 @@ HEADERS += ./glwidget.h \
     RenderCamera.h \
     SceneManager.h \
     SceneObject.h \
+    StereoCamera.h \
     perspectivecamera.h
 
 SOURCES += ./glwidget.cpp \
@@ -49,6 +50,7 @@ SOURCES += ./glwidget.cpp \
     RenderCamera.cpp \
     SceneManager.cpp \
     SceneObject.cpp \
+    StereoCamera.cpp \
     perspectivecamera.cpp
 
 FORMS += ./mainwindow.ui

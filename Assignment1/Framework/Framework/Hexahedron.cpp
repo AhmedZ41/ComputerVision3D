@@ -79,3 +79,13 @@ QDebug& operator << (QDebug& dbg, const Hexahedron &hex)
     dbg.nospace() << "\n";
     return dbg.space();
 }
+
+
+
+
+Hexahedron::Hexahedron(const std::array<QVector4D, 8>& pts)
+{
+    for (const auto& p : pts)
+        this->push_back(QVector3D(p.x(), p.y(), p.z()));  // convert 4D to 3D and store in inherited vector
+}
+

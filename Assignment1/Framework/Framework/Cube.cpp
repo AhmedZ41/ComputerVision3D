@@ -18,3 +18,10 @@ Cube::Cube (const Cube& c): Hexahedron(c)
 {
     type = SceneObjectType::ST_CUBE;
 }
+
+Cube::Cube(const std::array<QVector4D, 8>& pts)
+    : Hexahedron(pts)  // call the base constructor
+{
+    type = SceneObjectType::ST_CUBE;
+}
+

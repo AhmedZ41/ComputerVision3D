@@ -36,7 +36,10 @@ void SceneManager::draw(const RenderCamera& renderer, const QColor& color) const
                 // This is the place to invoke the perspective camera's projection method and draw the projected objects.
 
                 break;
+
             case ST_STEREO_CAMERA:
+                obj->draw(renderer, COLOR_CAMERA, 2.0f); // Part 2 draw call
+                break;
                 // TODO: Assignement 2, Part 1 - 3
                 // Part 1: This is the place to invoke the stereo camera's projection method and draw the projected objects.
                 // Part 2: This is the place to invoke the stereo camera's reconstruction method.

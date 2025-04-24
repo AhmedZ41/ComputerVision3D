@@ -3,6 +3,8 @@
 #include "QtConvenience.h"
 #include "Cube.h"  // Access Cube::getPoints()
 #include "Plane.h"
+#include "StereoCamera.h"
+
 
 #include <cmath>
 
@@ -100,9 +102,9 @@ void PerspectiveCamera::draw(const RenderCamera& renderer,
 
     for (const auto& cube : projectedObjects) {
         for (const auto& edge : edges) {
-            //renderer.renderLine(cube[edge[0]], cube[edge[1]], QColor(255, 0, 0), 1.5f); // Green projected edges
+            renderer.renderLine(cube[edge[0]], cube[edge[1]], QColor(255, 0, 0), 1.5f); // Green projected edges
             // Convert the 3D projected point into the image plane's local coordinate system
-
+/*
             auto projectToImagePlane = [&](const QVector4D& p) -> QVector2D {
                 QVector3D vec = QVector3D(p) - QVector3D(principalPoint);
                 float u = QVector3D::dotProduct(vec, rightVector);
@@ -130,7 +132,7 @@ void PerspectiveCamera::draw(const RenderCamera& renderer,
                         renderer.renderLine(p1, p2, QColor(255, 0, 0), 1.5f);
                     }
                 }
-            }
+            }*/
 
         }
     }
@@ -218,3 +220,36 @@ void PerspectiveCamera::addCube(const Cube& cube)
     if (projection.has_value())
         projectedObjects.push_back(projection.value());
 }
+
+
+const std::vector<std::array<QVector4D, 8>>& PerspectiveCamera::getProjectedCubes() const {
+    return projectedObjects;
+}
+
+// Triangulation: reconstructs a 3D point from its projections in two cameras
+QVector4D PerspectiveCamera::triangulatePoint(const QVector4D& p1,
+                                              const PerspectiveCamera& cam2,
+                                              const QVector4D& p2) const
+{
+    QVector3D n1 = viewDirection;
+    QVector3D n2 = cam2.viewDirection;
+    QVector3D c1 = QVector3D(centerOfProjection);
+    QVector3D c2 = QVector3D(cam2.centerOfProjection);
+
+    QVector3D d1 = QVector3D(p1) - c1;
+    QVector3D d2 = QVector3D(p2) - c2;
+
+    d1.normalize();
+    d2.normalize();
+
+    QVector3D n = QVector3D::crossProduct(d1, d2).normalized();
+
+    float t = QVector3D::dotProduct((c2 - c1), QVector3D::crossProduct(n, d2)) /
+              QVector3D::dotProduct(d1, QVector3D::crossProduct(n, d2));
+
+    QVector3D p = c1 + t * d1;
+
+    return to4D(p); // homogeneous coordinate
+}
+
+

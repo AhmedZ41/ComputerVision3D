@@ -6,6 +6,8 @@
 class Cube: public Hexahedron
 {
 public:
+    Cube(const std::array<QVector4D, 8>& pts);  // New constructor
+
     Cube (QVector4D _origin=E1+E0, float _sideLength=1.0);
     Cube (const Cube& c);
     virtual ~Cube() override {}

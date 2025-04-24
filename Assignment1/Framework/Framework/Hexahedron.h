@@ -43,6 +43,9 @@ public:
                             const QColor      & color     = COLOR_SCENE,
                             float               pointSize = 1) const;
 
+    Hexahedron(const std::array<QVector4D, 8>& pts);
+
+
 protected:
     // Some convenience members to iterate a hexahedron's vertices and edges
     constexpr static unsigned edgeCount = 12;

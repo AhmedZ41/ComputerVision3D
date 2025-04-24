@@ -65,6 +65,7 @@ SOURCES       = ../../glwidget.cpp \
 		../../RenderCamera.cpp \
 		../../SceneManager.cpp \
 		../../SceneObject.cpp \
+		../../StereoCamera.cpp \
 		../../perspectivecamera.cpp GeneratedFiles/debug/moc_glwidget.cpp \
 		GeneratedFiles/debug/moc_mainwindow.cpp \
 		GeneratedFiles/debug/moc_RenderCamera.cpp
@@ -81,6 +82,7 @@ OBJECTS       = debug/glwidget.o \
 		debug/RenderCamera.o \
 		debug/SceneManager.o \
 		debug/SceneObject.o \
+		debug/StereoCamera.o \
 		debug/perspectivecamera.o \
 		debug/moc_glwidget.o \
 		debug/moc_mainwindow.o \
@@ -345,6 +347,7 @@ DIST          = /Users/ahmedadnan/Qt/6.9.0/macos/mkspecs/features/spec_pre.prf \
 		../../RenderCamera.h \
 		../../SceneManager.h \
 		../../SceneObject.h \
+		../../StereoCamera.h \
 		../../perspectivecamera.h ../../glwidget.cpp \
 		../../mainwindow.cpp \
 		../../main.cpp \
@@ -358,6 +361,7 @@ DIST          = /Users/ahmedadnan/Qt/6.9.0/macos/mkspecs/features/spec_pre.prf \
 		../../RenderCamera.cpp \
 		../../SceneManager.cpp \
 		../../SceneObject.cpp \
+		../../StereoCamera.cpp \
 		../../perspectivecamera.cpp
 QMAKE_TARGET  = Framework
 DESTDIR       = 
@@ -916,8 +920,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../../glwidget.h ../../mainwindow.h ../../PointCloud.h ../../GLConvenience.h ../../QtConvenience.h ../../Axes.h ../../Cube.h ../../Hexahedron.h ../../Plane.h ../../RenderCamera.h ../../SceneManager.h ../../SceneObject.h ../../perspectivecamera.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../glwidget.cpp ../../mainwindow.cpp ../../main.cpp ../../PointCloud.cpp ../../GLConvenience.cpp ../../QtConvenience.cpp ../../Axes.cpp ../../Cube.cpp ../../Hexahedron.cpp ../../Plane.cpp ../../RenderCamera.cpp ../../SceneManager.cpp ../../SceneObject.cpp ../../perspectivecamera.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../glwidget.h ../../mainwindow.h ../../PointCloud.h ../../GLConvenience.h ../../QtConvenience.h ../../Axes.h ../../Cube.h ../../Hexahedron.h ../../Plane.h ../../RenderCamera.h ../../SceneManager.h ../../SceneObject.h ../../StereoCamera.h ../../perspectivecamera.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../glwidget.cpp ../../mainwindow.cpp ../../main.cpp ../../PointCloud.cpp ../../GLConvenience.cpp ../../QtConvenience.cpp ../../Axes.cpp ../../Cube.cpp ../../Hexahedron.cpp ../../Plane.cpp ../../RenderCamera.cpp ../../SceneManager.cpp ../../SceneObject.cpp ../../StereoCamera.cpp ../../perspectivecamera.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../mainwindow.ui $(DISTDIR)/
 
 
@@ -1165,7 +1169,8 @@ debug/glwidget.o: ../../glwidget.cpp ../../glwidget.h \
 		../../Cube.h \
 		../../Hexahedron.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
-		../../PerspectiveCamera.h
+		../../PerspectiveCamera.h \
+		../../StereoCamera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/glwidget.o ../../glwidget.cpp
 
 debug/mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
@@ -1861,6 +1866,132 @@ debug/SceneManager.o: ../../SceneManager.cpp ../../SceneManager.h \
 debug/SceneObject.o: ../../SceneObject.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/SceneObject.o ../../SceneObject.cpp
 
+debug/StereoCamera.o: ../../StereoCamera.cpp ../../StereoCamera.h \
+		../../SceneObject.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QColor \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qcolor.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QMatrix4x4 \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qmatrix4x4.h \
+		../../RenderCamera.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtCore.framework/Headers/QObject \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtCore.framework/Headers/qobject.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector3D \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvectornd.h \
+		../../PerspectiveCamera.h \
+		../../Axes.h \
+		../../Plane.h \
+		../../Cube.h \
+		../../Hexahedron.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
+		../../GLConvenience.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QtGui \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtguiglobal.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qabstractfileiconprovider.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qabstracttextdocumentlayout.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qaccessible.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qaccessiblebridge.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qaccessibleobject.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qaccessibleplugin.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qaction.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qactiongroup.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qbackingstore.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qbitmap.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qbrush.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qclipboard.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qcolorspace.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qcolortransform.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qcursor.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qdesktopservices.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qdrag.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qevent.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qeventpoint.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qfilesystemmodel.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qfont.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qfontdatabase.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qfontinfo.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qfontmetrics.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qfontvariableaxis.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qgenericmatrix.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qgenericplugin.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qgenericpluginfactory.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qglyphrun.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qguiapplication.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qicon.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qiconengine.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qiconengineplugin.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qimage.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qimageiohandler.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qimagereader.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qimagewriter.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qinputdevice.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qinputmethod.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qkeysequence.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qmovie.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qoffscreensurface.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qopengl.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qopenglcontext.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qopenglextrafunctions.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qopenglfunctions.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpagedpaintdevice.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpagelayout.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpageranges.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpagesize.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpaintdevice.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpaintdevicewindow.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpaintengine.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpainter.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpainterpath.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpainterstateguard.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpalette.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpdfoutputintent.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpdfwriter.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpen.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpicture.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpixelformat.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpixmap.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpixmapcache.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpointingdevice.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qpolygon.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qquaternion.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qrasterwindow.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qrawfont.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qregion.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qrgb.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qrgba64.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qrgbafloat.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qscreen.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qsessionmanager.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qshortcut.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qstandarditemmodel.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qstatictext.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qstylehints.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qsurface.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qsurfaceformat.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qsyntaxhighlighter.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtextcursor.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtextdocument.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtextdocumentfragment.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtextdocumentwriter.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtextformat.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtextlayout.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtextlist.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtextobject.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtextoption.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtexttable.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtguiversion.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtransform.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qundogroup.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qundostack.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qutimimeconverter.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvalidator.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvector2d.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvector3d.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvector4d.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qwindow.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qwindowdefs.h \
+		../../QtConvenience.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/StereoCamera.o ../../StereoCamera.cpp
+
 debug/perspectivecamera.o: ../../perspectivecamera.cpp ../../PerspectiveCamera.h \
 		../../SceneObject.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QColor \
@@ -1981,7 +2112,10 @@ debug/perspectivecamera.o: ../../perspectivecamera.cpp ../../PerspectiveCamera.h
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qwindow.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qwindowdefs.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
-		../../QtConvenience.h
+		../../QtConvenience.h \
+		../../Cube.h \
+		../../Hexahedron.h \
+		../../StereoCamera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/perspectivecamera.o ../../perspectivecamera.cpp
 
 debug/moc_glwidget.o: GeneratedFiles/debug/moc_glwidget.cpp 

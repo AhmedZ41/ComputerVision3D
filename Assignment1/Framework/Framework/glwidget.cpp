@@ -35,6 +35,8 @@
 #include "PointCloud.h"
 #include "Cube.h"
 #include "PerspectiveCamera.h"
+#include "StereoCamera.h"
+
 
 
 
@@ -105,11 +107,11 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //
 
     auto cam2 = new PerspectiveCamera(
-        E0 + 1*E3,          // shifted right a bit
-        QVector3D(0, 0, -1),         // same view direction
-        QVector3D(0, 1, 0),          // same up
-        2.0f,                        // same focal length
-        1.5f, 1.5f                   // same image plane size
+        E0 + (-2)*E1 + 1*E3,          // pos
+        QVector3D(0, 0, -1),         // view direction
+        QVector3D(0, 1, 0),          // up
+        2.0f,                        // focal length
+        1.5f, 1.5f                   // image plane size
         );
     sceneManager.push_back(cam2);   // Add to scene
 
@@ -119,6 +121,34 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
             cam2->addCube(*reinterpret_cast<Cube*>(s));
         }
     }
+
+    // === Assignment 2, Part 2 ===
+    // Reconstruct 3D points by triangulating corresponding projections
+    const auto& projList1 = cam->getProjectedObjects();
+    const auto& projList2 = cam2->getProjectedObjects();
+
+    for (size_t i = 0; i < projList1.size(); ++i) {
+        const auto& proj1 = projList1[i];
+        const auto& proj2 = projList2[i];
+
+
+        std::array<QVector4D, 8> reconstructed;
+
+        for (int j = 0; j < 8; ++j) {
+            reconstructed[j] = cam->triangulatePoint(proj1[j], *cam2, proj2[j]);
+        }
+
+        // Visualize reconstructed cube (e.g., render edges in a different color or just store it)
+        Cube* reconstructedCube = new Cube(reconstructed);
+        sceneManager.push_back(reconstructedCube);
+    }
+
+
+
+    auto stereo = new StereoCamera(cam, cam2);
+    stereo->reconstructFromStereo();
+    sceneManager.push_back(stereo);
+
 
 }
 

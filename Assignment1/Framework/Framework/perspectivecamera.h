@@ -53,6 +53,12 @@ public:
     // TODO (Part 3): Method to project 3D points to image plane
     void addCube(const Cube& cube); // Register a cube for projection
 
+    const std::vector<std::array<QVector4D, 8>>& getProjectedCubes() const;
+    QVector4D triangulatePoint(const QVector4D& p1, const PerspectiveCamera& cam2, const QVector4D& p2) const;
+
+    const std::vector<std::array<QVector4D, 8>>& getProjectedObjects() const {
+        return projectedObjects;
+    }
 
 private:
     // Helper to update cameraToWorld and derived members
