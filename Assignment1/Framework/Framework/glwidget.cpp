@@ -61,9 +61,9 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //       Add here your own new 3d scene objects, e.g. cubes, hexahedra, etc.,
     //       analog to line 50 above and the respective Axes-class
     //
-    sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + E2, .5f));
-    sceneManager.push_back(new Cube(E0 + 9*E3 + -E1 + 1*E2, .5f));
-    sceneManager.push_back(new Cube(E0 + 5*E3 + -E1 + -0.5*E2, .5f));
+    sceneManager.push_back(new Cube(E0 + 6*E3 + 2*E1 + E2, .5f));
+    sceneManager.push_back(new Cube(E0 + 9*E3 + 1*E1 + 1*E2, .5f));
+    sceneManager.push_back(new Cube(E0 + 5*E3 + 1*E1 + -0.5*E2, .5f));
     //sceneManager.push_back(new Cube(E0 + 5*E3 + -5*E1 + -0.5*E2, .5f));
 
 
@@ -107,7 +107,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //
 
     auto cam2 = new PerspectiveCamera(
-        E0 + (-2)*E1 + 1*E3,          // pos
+        E0 + (-1)*E1 + 1*E3,          // pos
         QVector3D(0, 0, -1),         // view direction
         QVector3D(0, 1, 0),          // up
         2.0f,                        // focal length
@@ -124,6 +124,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
 
     // === Assignment 2, Part 2 ===
     // Reconstruct 3D points by triangulating corresponding projections
+/*
     const auto& projList1 = cam->getProjectedObjects();
     const auto& projList2 = cam2->getProjectedObjects();
 
@@ -135,13 +136,14 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         std::array<QVector4D, 8> reconstructed;
 
         for (int j = 0; j < 8; ++j) {
-            reconstructed[j] = cam->triangulatePoint(proj1[j], *cam2, proj2[j]);
+            reconstructed[j] = cam->triangulate(*cam, proj1[j], *cam2, proj2[j]);
         }
 
         // Visualize reconstructed cube (e.g., render edges in a different color or just store it)
         Cube* reconstructedCube = new Cube(reconstructed);
         sceneManager.push_back(reconstructedCube);
     }
+*/
 
 
 

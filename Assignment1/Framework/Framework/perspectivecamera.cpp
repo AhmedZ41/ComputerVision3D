@@ -136,6 +136,14 @@ void PerspectiveCamera::draw(const RenderCamera& renderer,
 
         }
     }
+
+    // Draw rays from camera to projected points
+    for (const auto& cube : projectedObjects) {
+        for (int i = 0; i < 8; ++i) {
+            renderer.renderLine(centerOfProjection, cube[i], QColor(0, 0, 255), 1.0f); // Blue rays
+        }
+    }
+
 }
 
 //
@@ -253,3 +261,25 @@ QVector4D PerspectiveCamera::triangulatePoint(const QVector4D& p1,
 }
 
 
+QVector4D PerspectiveCamera::triangulate(const PerspectiveCamera& cam1,
+                                         const QVector4D& p1,
+                                         const PerspectiveCamera& cam2,
+                                         const QVector4D& p2)
+{
+    QVector3D c1 = QVector3D(cam1.centerOfProjection);
+    QVector3D c2 = QVector3D(cam2.centerOfProjection);
+
+    QVector3D d1 = QVector3D(p1) - c1;
+    QVector3D d2 = QVector3D(p2) - c2;
+
+    d1.normalize();
+    d2.normalize();
+
+    QVector3D n = QVector3D::crossProduct(d1, d2).normalized();
+
+    float t = QVector3D::dotProduct((c2 - c1), QVector3D::crossProduct(n, d2)) /
+              QVector3D::dotProduct(d1, QVector3D::crossProduct(n, d2));
+
+    QVector3D p = c1 + t * d1;
+    return to4D(p);
+}

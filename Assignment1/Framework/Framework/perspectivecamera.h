@@ -60,6 +60,12 @@ public:
         return projectedObjects;
     }
 
+    static QVector4D triangulate(const PerspectiveCamera& cam1,
+                                 const QVector4D& p1,
+                                 const PerspectiveCamera& cam2,
+                                 const QVector4D& p2);
+
+
 private:
     // Helper to update cameraToWorld and derived members
     void computeCameraCoordinateSystem();

@@ -46,5 +46,6 @@ void SceneManager::draw(const RenderCamera& renderer, const QColor& color) const
                 // Part 3: This is the place to invoke the stereo camera's reconstruction method using misaligned stereo cameras.
                 break;
             }
+
         }
 }
