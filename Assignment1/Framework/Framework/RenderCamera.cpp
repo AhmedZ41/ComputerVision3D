@@ -38,7 +38,7 @@ void RenderCamera::reset()
     yRotation=0;
     zRotation=0;
     setPosition(QVector3D(-0.05f, -0.0f, -0.1f));
-    rotate(0, 130, 30);
+    rotate(0, 0, 0);
     renderMatrix = getRenderMatrix();
 }
 

@@ -182,9 +182,12 @@ void GLWidget::initializeGL()
 //
 void GLWidget::paintGL()
 {
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // dunkles Grau
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // ← Wichtig!
+
     renderer->setup();
 
-    sceneManager.draw(*renderer,COLOR_SCENE);
+    sceneManager.draw(*renderer, COLOR_SCENE);
 }
 
 //

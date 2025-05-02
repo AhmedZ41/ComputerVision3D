@@ -11,9 +11,7 @@ INCLUDEPATH += ./GeneratedFiles \
     . \
     ./GeneratedFiles/Debug \
     ./external/eigen-3.4.0
-#LIBS += -lopengl32 -lglu32   # on Linux and Mac use "LIBS += -lglut" instead
-LIBS += -framework OpenGL
-LIBS += -framework GLUT
+LIBS += -lopengl32 -lglu32   # on Linux and Mac use "LIBS += -lglut" instead
 CONFIG += c++20              # using c++20 leads to conflict in ./external/eigen-3.4.0/Eigen/src/Core/util/Meta.h
 RESOURCES +=
 DEPENDPATH += .
@@ -30,12 +28,12 @@ HEADERS += ./glwidget.h \
     Axes.h \
     Cube.h \
     Hexahedron.h \
+    PerspectiveCamera.h \
     Plane.h \
     RenderCamera.h \
     SceneManager.h \
     SceneObject.h \
-    StereoCamera.h \
-    perspectivecamera.h
+    StereoCamera.h
 
 SOURCES += ./glwidget.cpp \
      ./mainwindow.cpp \
@@ -46,11 +44,11 @@ SOURCES += ./glwidget.cpp \
     Axes.cpp \
     Cube.cpp \
     Hexahedron.cpp \
+    PerspectiveCamera.cpp \
     Plane.cpp \
     RenderCamera.cpp \
     SceneManager.cpp \
     SceneObject.cpp \
-    StereoCamera.cpp \
-    perspectivecamera.cpp
+    StereoCamera.cpp
 
 FORMS += ./mainwindow.ui

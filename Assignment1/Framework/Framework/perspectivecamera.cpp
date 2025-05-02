@@ -56,15 +56,6 @@ PerspectiveCamera::PerspectiveCamera(const QVector4D& position,
 }
 
 //
-// ====================== Destructor ======================
-//
-PerspectiveCamera::~PerspectiveCamera()
-{
-    delete localAxes;
-    delete imagePlane;
-}
-
-//
 // ====================== Draw Method ======================
 // p 2 – Visualize camera & image plane
 // p 3 – Visualize projections

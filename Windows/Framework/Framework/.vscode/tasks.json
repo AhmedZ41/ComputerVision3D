@@ -1,0 +1,35 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-std=c++17",
+                "-I.",
+                "-Iexternal",
+                "-I/usr/include/qt",
+                "-I/usr/include/qt/QtWidgets",
+                "-I/usr/include/qt/QtGui",
+                "-I/usr/include/qt/QtCore",
+                "-I/usr/include/qt/QtOpenGL",
+                "-fPIC",
+                "-Wall",
+                "-g",
+                "*.cpp",
+                "external/*.cpp",
+                "-o",
+                "myapp",
+                "-lQt5Widgets",
+                "-lQt5Core",
+                "-lQt5Gui",
+                "-lQt5OpenGL",
+                "-lGL",
+                "-lGLU"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}
