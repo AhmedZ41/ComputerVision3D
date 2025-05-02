@@ -13,6 +13,10 @@ public:
     void affineMap(const QMatrix4x4& matrix) override;
 
     void reconstructFromStereo(); // part 2
+    void reconstructFromStereo(float errorInDegrees = 0.0f);
+    SceneManager* sceneReference = nullptr;
+
+
 
 private:
     PerspectiveCamera* camLeft;

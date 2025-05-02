@@ -61,9 +61,9 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //       Add here your own new 3d scene objects, e.g. cubes, hexahedra, etc.,
     //       analog to line 50 above and the respective Axes-class
     //
-    sceneManager.push_back(new Cube(E0 + 6*E3 + 2*E1 + E2, .5f));
-    sceneManager.push_back(new Cube(E0 + 9*E3 + 1*E1 + 1*E2, .5f));
-    sceneManager.push_back(new Cube(E0 + 5*E3 + 1*E1 + -0.5*E2, .5f));
+    sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + E2, .5f));
+    sceneManager.push_back(new Cube(E0 + 9*E3 + -1*E1 + 1*E2, .5f));
+    sceneManager.push_back(new Cube(E0 + 5*E3 + -1*E1 + -0.5*E2, .5f));
     //sceneManager.push_back(new Cube(E0 + 5*E3 + -5*E1 + -0.5*E2, .5f));
 
 
@@ -106,25 +106,39 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //       - This has to be used in Scene.cpp/Scene::draw.
     //
 
+    // === Add second perspective camera ===
     auto cam2 = new PerspectiveCamera(
-        E0 + (-1)*E1 + 1*E3,          // pos
-        QVector3D(0, 0, -1),         // view direction
-        QVector3D(0, 1, 0),          // up
-        2.0f,                        // focal length
-        1.5f, 1.5f                   // image plane size
+        E0 - 10*E1 + 1*E3,                // position
+        QVector3D(0, 0, -1),             // view direction
+        QVector3D(0, 1, 0),              // up vector
+        2.0f, 1.5f, 1.5f                 // focal length, image plane size
         );
-    sceneManager.push_back(cam2);   // Add to scene
+    sceneManager.push_back(cam2);
 
-    // Add all existing cubes to cam2 for projection
+
+
+    // === Simulate camera misalignment (Part 3) ===
+
+    QMatrix4x4 rotation;
+    rotation.setToIdentity();
+    rotation.rotate(1.0f, QVector3D(0, 1, 0)); // 15° rotation around Y-axis
+    cam2->affineMap(rotation);
+    cam2->recomputeViewDirections(); // Update view direction after transform
+
+
+
+
+    // === Project all cubes onto cam2's image plane ===
     for (auto s : sceneManager) {
-        if (s->getType() == SceneObjectType::ST_CUBE) {
+        if (s->getType() == SceneObjectType::ST_CUBE)
             cam2->addCube(*reinterpret_cast<Cube*>(s));
-        }
     }
 
-    // === Assignment 2, Part 2 ===
-    // Reconstruct 3D points by triangulating corresponding projections
-/*
+
+
+
+    // === Manual triangulation & display (used for debugging) ===
+    /*
     const auto& projList1 = cam->getProjectedObjects();
     const auto& projList2 = cam2->getProjectedObjects();
 
@@ -132,27 +146,36 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         const auto& proj1 = projList1[i];
         const auto& proj2 = projList2[i];
 
-
         std::array<QVector4D, 8> reconstructed;
-
         for (int j = 0; j < 8; ++j) {
             reconstructed[j] = cam->triangulate(*cam, proj1[j], *cam2, proj2[j]);
         }
 
-        // Visualize reconstructed cube (e.g., render edges in a different color or just store it)
         Cube* reconstructedCube = new Cube(reconstructed);
         sceneManager.push_back(reconstructedCube);
     }
-*/
+    */
 
 
 
+    // === Use StereoCamera class to handle projection and reconstruction ===
+    /*
     auto stereo = new StereoCamera(cam, cam2);
     stereo->reconstructFromStereo();
     sceneManager.push_back(stereo);
+*/
+    auto stereo = new StereoCamera(cam, cam2);
+    stereo->reconstructFromStereo(3.0f); // 1° error
+    sceneManager.push_back(stereo);
 
+    // === Project all cubes onto cam2's image plane ===
+    for (auto s : sceneManager) {
+        if (s->getType() == SceneObjectType::ST_CUBE)
+            cam2->addCube(*reinterpret_cast<Cube*>(s));
+    }
 
 }
+
 
 
 //

@@ -3,6 +3,8 @@
 #include "SceneObject.h"
 #include "Axes.h"
 #include "Plane.h"
+#include "SceneManager.h"
+
 class Cube;  // 👈 Forward declaration
 
 
@@ -64,6 +66,11 @@ public:
                                  const QVector4D& p1,
                                  const PerspectiveCamera& cam2,
                                  const QVector4D& p2);
+    void recomputeViewDirections();
+    void clearProjectedCubes();
+    SceneManager* sceneReference = nullptr;
+
+
 
 
 private:

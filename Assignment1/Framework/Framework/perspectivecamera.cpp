@@ -1,16 +1,14 @@
 #include "PerspectiveCamera.h"
 #include "GLConvenience.h"
 #include "QtConvenience.h"
-#include "Cube.h"  // Access Cube::getPoints()
+#include "Cube.h"
 #include "Plane.h"
 #include "StereoCamera.h"
-
-
 #include <cmath>
 
 //
-// ====================== Constructor ======================
-// Assignment 2 – Define Camera Parameters & Setup
+// ========== Constructor ==========
+// Initializes camera parameters and sets up the image plane and local axes
 //
 PerspectiveCamera::PerspectiveCamera(const QVector4D& position,
                                      const QVector3D& lookDir,
@@ -27,36 +25,27 @@ PerspectiveCamera::PerspectiveCamera(const QVector4D& position,
 {
     type = SceneObjectType::ST_PERSPECTIVE_CAMERA;
 
-    computeCameraCoordinateSystem(); // part 2
+    computeCameraCoordinateSystem(); // Compute view, up, and right axes
 
-    // Compute principal point H = N + f * (-v)
+    // Compute principal point: H = N + f * (-v)
     QVector3D imagePlaneCenter = QVector3D(centerOfProjection) + (-viewDirection) * focalLength;
     principalPoint = to4D(imagePlaneCenter);
 
-    // Axes at camera origin (p 2 - Visualize local axes)
+    // Build local coordinate axes object for visualization
     QMatrix4x4 R;
     R.setColumn(0, to4D(rightVector));
     R.setColumn(1, to4D(upVector));
     R.setColumn(2, to4D(-viewDirection));
     R.setColumn(3, QVector4D(0, 0, 0, 1));
-
     localAxes = new Axes(centerOfProjection, R);
 
-    // Compute corners of image plane
-    QVector3D x = rightVector * (imagePlaneWidth / 2.0f);
-    QVector3D y = upVector    * (imagePlaneHeight / 2.0f);
-    QVector3D tl = imagePlaneCenter - x + y;
-    QVector3D tr = imagePlaneCenter + x + y;
-    QVector3D br = imagePlaneCenter + x - y;
-    QVector3D bl = imagePlaneCenter - x - y;
-
-    //imagePlane = new Plane(to4D(tl), to4D(viewDirection)); // p 2
-    imagePlane = new Plane(principalPoint, to4D(viewDirection)); // correct: origin = H (principal point)
-
+    // Build image plane (origin at principal point)
+    imagePlane = new Plane(principalPoint, to4D(viewDirection));
 }
 
 //
-// ====================== Destructor ======================
+// ========== Destructor ==========
+// Frees allocated memory for axes and image plane
 //
 PerspectiveCamera::~PerspectiveCamera()
 {
@@ -65,110 +54,71 @@ PerspectiveCamera::~PerspectiveCamera()
 }
 
 //
-// ====================== Draw Method ======================
-// p 2 – Visualize camera & image plane
-// p 3 – Visualize projections
+// ========== draw() ==========
+// Renders the camera's components and its projected cubes
 //
 void PerspectiveCamera::draw(const RenderCamera& renderer,
                              const QColor& color,
                              float lineWidth) const
 {
-    // --- p 2: Camera visualization ---
-    localAxes->draw(renderer, QColor(255, 255, 0), lineWidth);                    // Local axes at N
-    renderer.renderPoint(centerOfProjection, color, 5.0f);          // Center of projection (N)
-    renderer.renderPoint(principalPoint, QColor(255, 0, 255), 5.0f); // Principal point (H)
-    renderer.renderLine(centerOfProjection, principalPoint, QColor(255, 0, 0), 2.0f); // Line N → H
+    // --- Camera visuals: position, principal point, axes
+    localAxes->draw(renderer, QColor(255, 255, 0), lineWidth);
+    renderer.renderPoint(centerOfProjection, color, 5.0f);
+    renderer.renderPoint(principalPoint, QColor(255, 0, 255), 5.0f);
+    renderer.renderLine(centerOfProjection, principalPoint, QColor(255, 0, 0), 2.0f);
 
-    // Image plane quad
-    //QVector3D x = rightVector * (imagePlaneWidth / 2.0f);
-    //QVector3D y = upVector    * (imagePlaneHeight / 2.0f);
-    //QVector3D center = QVector3D(principalPoint);
-    //QVector3D tl = center - x + y;
-    //QVector3D tr = center + x + y;
-    //QVector3D br = center + x - y;
-    //QVector3D bl = center - x - y;
-
-    //renderer.renderPlane(tl, tr, br, bl, QColor(200, 0, 100), 0.3f); // Transparent image plane
-
+    // --- Draw image plane
     imagePlane->draw(renderer, QColor(200, 200, 0), 0.3f);
 
-
-    // --- p 3: Projected cubes
+    // --- Draw edges of projected cubes (in red)
     std::array<std::array<int, 2>, 12> edges = {{
         {0,1}, {1,2}, {2,3}, {3,0},
         {4,5}, {5,6}, {6,7}, {7,4},
         {0,4}, {1,5}, {2,6}, {3,7}
     }};
-
     for (const auto& cube : projectedObjects) {
         for (const auto& edge : edges) {
-            renderer.renderLine(cube[edge[0]], cube[edge[1]], QColor(255, 0, 0), 1.5f); // Green projected edges
-            // Convert the 3D projected point into the image plane's local coordinate system
-/*
-            auto projectToImagePlane = [&](const QVector4D& p) -> QVector2D {
-                QVector3D vec = QVector3D(p) - QVector3D(principalPoint);
-                float u = QVector3D::dotProduct(vec, rightVector);
-                float v = QVector3D::dotProduct(vec, upVector);
-                return QVector2D(u, v);
-            };
-
-            for (const auto& cube : projectedObjects) {
-                for (const auto& edge : edges) {
-                    QVector4D p1 = cube[edge[0]];
-                    QVector4D p2 = cube[edge[1]];
-
-                    QVector2D uv1 = projectToImagePlane(p1);
-                    QVector2D uv2 = projectToImagePlane(p2);
-
-                    float w = imagePlaneWidth  / 2.0f;
-                    float h = imagePlaneHeight / 2.0f;
-
-                    // Check if at least one of the points is inside the image bounds
-                    auto isInside = [&](const QVector2D& uv) {
-                        return uv.x() >= -w && uv.x() <= w && uv.y() >= -h && uv.y() <= h;
-                    };
-
-                    if (isInside(uv1) || isInside(uv2)) {
-                        renderer.renderLine(p1, p2, QColor(255, 0, 0), 1.5f);
-                    }
-                }
-            }*/
-
+            renderer.renderLine(cube[edge[0]], cube[edge[1]], QColor(255, 0, 0), 1.5f);
         }
     }
 
-    // Draw rays from camera to projected points
+    // --- Draw projection rays from camera to projected points (in blue)
     for (const auto& cube : projectedObjects) {
         for (int i = 0; i < 8; ++i) {
-            renderer.renderLine(centerOfProjection, cube[i], QColor(0, 0, 255), 1.0f); // Blue rays
+            renderer.renderLine(centerOfProjection, cube[i], QColor(0, 0, 255), 1.0f);
         }
     }
-
 }
 
 //
-// ====================== Affine Transform ======================
-// p 2 – Allow transforming camera with matrix
+// ========== affineMap() ==========
+// Applies an affine transformation to the camera and updates internal states
 //
-void PerspectiveCamera::affineMap(const QMatrix4x4& matrix)
+void PerspectiveCamera::affineMap(const QMatrix4x4& M)
 {
-    centerOfProjection = matrix * centerOfProjection;
-    principalPoint = matrix * principalPoint;
+    viewDirection = (M * QVector4D(viewDirection, 0.0f)).toVector3D().normalized();
+    upVector      = (M * QVector4D(upVector,      0.0f)).toVector3D().normalized();
+
+    computeCameraCoordinateSystem();
+
+    centerOfProjection = M * centerOfProjection;
+    principalPoint = to4D(QVector3D(centerOfProjection) + (-viewDirection) * focalLength);
 
     QMatrix4x4 R;
     R.setColumn(0, to4D(rightVector));
     R.setColumn(1, to4D(upVector));
     R.setColumn(2, to4D(-viewDirection));
-    R.setColumn(3, QVector4D(0, 0, 0, 1));
+    R.setColumn(3, QVector4D(0,0,0,1));
+    cameraToWorld = M * R;
 
-    cameraToWorld = matrix * R;
+    localAxes->affineMap(M);
 
-    localAxes->affineMap(matrix);
+    clearProjectedCubes(); // Invalidate cached projections
 }
 
 //
-// ====================== Camera Basis Setup ======================
-// p 2 – Compute right, up, forward directions
+// ========== computeCameraCoordinateSystem() ==========
+// Recalculates the orthonormal view basis (right, up, forward)
 //
 void PerspectiveCamera::computeCameraCoordinateSystem()
 {
@@ -189,8 +139,8 @@ void PerspectiveCamera::computeCameraCoordinateSystem()
 }
 
 //
-// ====================== Cube Projection ======================
-// p 3 – Project cube vertices to image plane
+// ========== projectCube() ==========
+// Projects each point of a cube onto the camera's image plane
 //
 std::optional<std::array<QVector4D, 8>> PerspectiveCamera::projectCube(const std::array<QVector4D, 8>& cubePoints)
 {
@@ -202,14 +152,10 @@ std::optional<std::array<QVector4D, 8>> PerspectiveCamera::projectCube(const std
         float denom = QVector3D::dotProduct(QVector3D(viewDirection), QVector3D(v));
 
         if (std::abs(denom) < 1e-6f)
-            return std::nullopt; // Skip if denominator ≈ 0
-        //If denom is very close to zero, it means the ray from the camera to the point is almost parallel to the image plane.
+            return std::nullopt; // Cannot project (ray is parallel to image plane)
 
-
-        //lambda is a scalar used to compute the intersection point of a ray (from the camera to a 3D point) with the image plane.
         float lambda = -QVector3D::dotProduct(QVector3D(viewDirection),
                                               QVector3D(centerOfProjection - principalPoint)) / denom;
-
         projected[i] = centerOfProjection + lambda * v;
     }
 
@@ -217,8 +163,8 @@ std::optional<std::array<QVector4D, 8>> PerspectiveCamera::projectCube(const std
 }
 
 //
-// ====================== Add Cube to Projection ======================
-// p 3 – Store projected cube
+// ========== addCube() ==========
+// Registers a cube for projection and stores the result if valid
 //
 void PerspectiveCamera::addCube(const Cube& cube)
 {
@@ -229,38 +175,42 @@ void PerspectiveCamera::addCube(const Cube& cube)
         projectedObjects.push_back(projection.value());
 }
 
-
+//
+// ========== getProjectedCubes() ==========
+// Returns the cached projections
+//
 const std::vector<std::array<QVector4D, 8>>& PerspectiveCamera::getProjectedCubes() const {
     return projectedObjects;
 }
 
-// Triangulation: reconstructs a 3D point from its projections in two cameras
+//
+// ========== triangulatePoint() ==========
+// Reconstructs a 3D point from its 2D projections in two camera views
+//
+/*
 QVector4D PerspectiveCamera::triangulatePoint(const QVector4D& p1,
                                               const PerspectiveCamera& cam2,
                                               const QVector4D& p2) const
 {
-    QVector3D n1 = viewDirection;
-    QVector3D n2 = cam2.viewDirection;
     QVector3D c1 = QVector3D(centerOfProjection);
     QVector3D c2 = QVector3D(cam2.centerOfProjection);
-
     QVector3D d1 = QVector3D(p1) - c1;
     QVector3D d2 = QVector3D(p2) - c2;
 
-    d1.normalize();
-    d2.normalize();
+    d1.normalize(); d2.normalize();
 
     QVector3D n = QVector3D::crossProduct(d1, d2).normalized();
-
     float t = QVector3D::dotProduct((c2 - c1), QVector3D::crossProduct(n, d2)) /
               QVector3D::dotProduct(d1, QVector3D::crossProduct(n, d2));
 
     QVector3D p = c1 + t * d1;
-
-    return to4D(p); // homogeneous coordinate
+    return to4D(p);
 }
-
-
+*/
+//
+// ========== triangulate() (static) ==========
+// Static variant used outside the calling object
+//
 QVector4D PerspectiveCamera::triangulate(const PerspectiveCamera& cam1,
                                          const QVector4D& p1,
                                          const PerspectiveCamera& cam2,
@@ -268,18 +218,36 @@ QVector4D PerspectiveCamera::triangulate(const PerspectiveCamera& cam1,
 {
     QVector3D c1 = QVector3D(cam1.centerOfProjection);
     QVector3D c2 = QVector3D(cam2.centerOfProjection);
-
     QVector3D d1 = QVector3D(p1) - c1;
     QVector3D d2 = QVector3D(p2) - c2;
 
-    d1.normalize();
-    d2.normalize();
+    d1.normalize(); d2.normalize();
 
     QVector3D n = QVector3D::crossProduct(d1, d2).normalized();
-
     float t = QVector3D::dotProduct((c2 - c1), QVector3D::crossProduct(n, d2)) /
               QVector3D::dotProduct(d1, QVector3D::crossProduct(n, d2));
 
     QVector3D p = c1 + t * d1;
     return to4D(p);
+}
+
+//
+// ========== recomputeViewDirections() ==========
+// Rebuilds viewDirection, upVector, and rightVector from the cameraToWorld matrix
+//
+void PerspectiveCamera::recomputeViewDirections()
+{
+    QMatrix4x4 R = cameraToWorld;
+
+    rightVector = QVector3D(R.column(0)).normalized();
+    upVector = QVector3D(R.column(1)).normalized();
+    viewDirection = -QVector3D(R.column(2)).normalized();  // negative Z
+}
+
+//
+// ========== clearProjectedCubes() ==========
+// Empties all previous projections (e.g., after transformation)
+//
+void PerspectiveCamera::clearProjectedCubes() {
+    projectedObjects.clear();
 }
