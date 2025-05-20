@@ -108,7 +108,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
 
     // === Add second perspective camera ===
     auto cam2 = new PerspectiveCamera(
-        E0 - 10*E1 + 1*E3,                // position
+        E0 - 1*E1 + 1*E3,                // position
         QVector3D(0, 0, -1),             // view direction
         QVector3D(0, 1, 0),              // up vector
         2.0f, 1.5f, 1.5f                 // focal length, image plane size
@@ -121,7 +121,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
 
     QMatrix4x4 rotation;
     rotation.setToIdentity();
-    rotation.rotate(1.0f, QVector3D(0, 1, 0)); // 15° rotation around Y-axis
+    rotation.rotate(0.0f, QVector3D(0, 0, 0)); // 15° rotation around Y-axis
     cam2->affineMap(rotation);
     cam2->recomputeViewDirections(); // Update view direction after transform
 
@@ -165,7 +165,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     sceneManager.push_back(stereo);
 */
     auto stereo = new StereoCamera(cam, cam2);
-    stereo->reconstructFromStereo(3.0f); // 1° error
+    stereo->reconstructFromStereo(0.0f); // 1° error
     sceneManager.push_back(stereo);
 
     // === Project all cubes onto cam2's image plane ===

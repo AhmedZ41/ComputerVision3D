@@ -30,6 +30,7 @@ HEADERS += ./glwidget.h \
     Axes.h \
     Cube.h \
     Hexahedron.h \
+    PCA.h \
     Plane.h \
     RenderCamera.h \
     SceneManager.h \
@@ -46,6 +47,7 @@ SOURCES += ./glwidget.cpp \
     Axes.cpp \
     Cube.cpp \
     Hexahedron.cpp \
+    PCA.cpp \
     Plane.cpp \
     RenderCamera.cpp \
     SceneManager.cpp \
