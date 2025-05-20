@@ -28,9 +28,9 @@ HEADERS += ./glwidget.h \
     ./GLConvenience.h \
     ./QtConvenience.h \
     Axes.h \
+    BoundingBox.h \
     Cube.h \
     Hexahedron.h \
-    PCA.h \
     Plane.h \
     RenderCamera.h \
     SceneManager.h \
@@ -45,9 +45,9 @@ SOURCES += ./glwidget.cpp \
     ./GLConvenience.cpp \
     ./QtConvenience.cpp \
     Axes.cpp \
+    BoundingBox.cpp \
     Cube.cpp \
     Hexahedron.cpp \
-    PCA.cpp \
     Plane.cpp \
     RenderCamera.cpp \
     SceneManager.cpp \

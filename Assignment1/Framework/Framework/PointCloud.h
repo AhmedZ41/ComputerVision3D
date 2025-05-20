@@ -31,5 +31,6 @@ public:
     // setup point size
     void     setPointSize(unsigned s);
     unsigned getPointSize(          ) const { return pointSize; }
+
 };
 

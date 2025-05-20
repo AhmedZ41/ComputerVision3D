@@ -61,6 +61,7 @@ SOURCES       = ../../glwidget.cpp \
 		../../Axes.cpp \
 		../../Cube.cpp \
 		../../Hexahedron.cpp \
+		../../PCA.cpp \
 		../../Plane.cpp \
 		../../RenderCamera.cpp \
 		../../SceneManager.cpp \
@@ -78,6 +79,7 @@ OBJECTS       = debug/glwidget.o \
 		debug/Axes.o \
 		debug/Cube.o \
 		debug/Hexahedron.o \
+		debug/PCA.o \
 		debug/Plane.o \
 		debug/RenderCamera.o \
 		debug/SceneManager.o \
@@ -343,6 +345,7 @@ DIST          = /Users/ahmedadnan/Qt/6.9.0/macos/mkspecs/features/spec_pre.prf \
 		../../Axes.h \
 		../../Cube.h \
 		../../Hexahedron.h \
+		../../PCA.h \
 		../../Plane.h \
 		../../RenderCamera.h \
 		../../SceneManager.h \
@@ -357,6 +360,7 @@ DIST          = /Users/ahmedadnan/Qt/6.9.0/macos/mkspecs/features/spec_pre.prf \
 		../../Axes.cpp \
 		../../Cube.cpp \
 		../../Hexahedron.cpp \
+		../../PCA.cpp \
 		../../Plane.cpp \
 		../../RenderCamera.cpp \
 		../../SceneManager.cpp \
@@ -920,8 +924,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../../glwidget.h ../../mainwindow.h ../../PointCloud.h ../../GLConvenience.h ../../QtConvenience.h ../../Axes.h ../../Cube.h ../../Hexahedron.h ../../Plane.h ../../RenderCamera.h ../../SceneManager.h ../../SceneObject.h ../../StereoCamera.h ../../perspectivecamera.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../glwidget.cpp ../../mainwindow.cpp ../../main.cpp ../../PointCloud.cpp ../../GLConvenience.cpp ../../QtConvenience.cpp ../../Axes.cpp ../../Cube.cpp ../../Hexahedron.cpp ../../Plane.cpp ../../RenderCamera.cpp ../../SceneManager.cpp ../../SceneObject.cpp ../../StereoCamera.cpp ../../perspectivecamera.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../glwidget.h ../../mainwindow.h ../../PointCloud.h ../../GLConvenience.h ../../QtConvenience.h ../../Axes.h ../../Cube.h ../../Hexahedron.h ../../PCA.h ../../Plane.h ../../RenderCamera.h ../../SceneManager.h ../../SceneObject.h ../../StereoCamera.h ../../perspectivecamera.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../glwidget.cpp ../../mainwindow.cpp ../../main.cpp ../../PointCloud.cpp ../../GLConvenience.cpp ../../QtConvenience.cpp ../../Axes.cpp ../../Cube.cpp ../../Hexahedron.cpp ../../PCA.cpp ../../Plane.cpp ../../RenderCamera.cpp ../../SceneManager.cpp ../../SceneObject.cpp ../../StereoCamera.cpp ../../perspectivecamera.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../mainwindow.ui $(DISTDIR)/
 
 
@@ -1609,6 +1613,9 @@ debug/Hexahedron.o: ../../Hexahedron.cpp ../../Hexahedron.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/Hexahedron.o ../../Hexahedron.cpp
 
+debug/PCA.o: ../../PCA.cpp ../../PCA.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/PCA.o ../../PCA.cpp
+
 debug/Plane.o: ../../Plane.cpp ../../Plane.h \
 		../../SceneObject.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QColor \
@@ -1880,6 +1887,7 @@ debug/StereoCamera.o: ../../StereoCamera.cpp ../../StereoCamera.h \
 		../../PerspectiveCamera.h \
 		../../Axes.h \
 		../../Plane.h \
+		../../SceneManager.h \
 		../../Cube.h \
 		../../Hexahedron.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
@@ -2005,6 +2013,7 @@ debug/perspectivecamera.o: ../../perspectivecamera.cpp ../../PerspectiveCamera.h
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvectornd.h \
 		../../Axes.h \
 		../../Plane.h \
+		../../SceneManager.h \
 		../../GLConvenience.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QtGui \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtguiglobal.h \

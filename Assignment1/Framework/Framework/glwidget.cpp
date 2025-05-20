@@ -173,7 +173,6 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         if (s->getType() == SceneObjectType::ST_CUBE)
             cam2->addCube(*reinterpret_cast<Cube*>(s));
     }
-
 }
 
 
