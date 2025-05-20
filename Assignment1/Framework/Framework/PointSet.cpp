@@ -54,3 +54,10 @@ PointSet PointSet::extractSubsetInside(const QVector3D& minC, const QVector3D& m
 
     return PointSet(subset);
 }
+
+void PointSet::affineMap(const QMatrix4x4& matrix) {
+    for (auto& point : points) {
+        point = matrix * point;
+    }
+    computeBoundingBox(); // Recalculate bounding box after transformation
+}

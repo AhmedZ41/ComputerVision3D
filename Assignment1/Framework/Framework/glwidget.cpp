@@ -36,6 +36,10 @@
 #include "Cube.h"
 #include "PerspectiveCamera.h"
 #include "StereoCamera.h"
+#include "KDNode.h"
+#include "PointSet.h"
+#include "KDTree.h"
+
 
 
 
@@ -173,6 +177,25 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         if (s->getType() == SceneObjectType::ST_CUBE)
             cam2->addCube(*reinterpret_cast<Cube*>(s));
     }
+    // ==== Load bunny and encapsulated KDTree into scene ====
+    auto* bunny = new PointCloud();
+    QString bunnyPath = "/Users/ahmedadnan/Desktop/HTWG/S6/Computervision-3D/ComputerVision3D/Assignment1/Framework/data/bunny.ply";
+    QFileInfo info(bunnyPath);
+    if (!info.exists()) {
+        qDebug() << "File does not exist:" << bunnyPath;
+    } else {
+        qDebug() << "Found bunny.ply at:" << info.absoluteFilePath();
+    }
+
+    if (bunny->loadPLY("/Users/ahmedadnan/Desktop/HTWG/S6/Computervision-3D/ComputerVision3D/Assignment1/Framework/data/bunny.ply")) {
+        bunny->setPointSize(unsigned(pointSize));
+        sceneManager.push_back(bunny);
+
+        // Encapsulated KDTree scene object
+        auto* tree = new KDTree(bunny);
+        sceneManager.push_back(tree);
+    }
+
 }
 
 
@@ -333,6 +356,8 @@ void GLWidget::setPointSize(int size)
 // 2. opens file dialog
 // 3. loads ply-file data to new point cloud
 // 4. attaches new point cloud to scene management
+
+/*
 //
 void GLWidget::openFileDialog()
 {
@@ -349,11 +374,42 @@ void GLWidget::openFileDialog()
         return;
     }
     delete pointCloud;
+}*/
+
+void GLWidget::openFileDialog()
+{
+    const QString filePath = QFileDialog::getOpenFileName(this, tr("Open PLY file"), "../data", tr("PLY Files (*.ply)"));
+
+    if (filePath.isEmpty())
+        return;
+
+    // Load the point cloud
+    PointCloud* pointCloud = new PointCloud();
+    if (!pointCloud->loadPLY(filePath)) {
+        delete pointCloud;
+        return;
+    }
+
+    pointCloud->setPointSize(unsigned(pointSize));
+    sceneManager.push_back(pointCloud);
+
+    // ==== Build KD-tree ====
+    std::vector<QVector4D> rawPoints;
+    for (const auto& p : *pointCloud)
+        rawPoints.push_back(p);
+
+    PointSet fullSet(rawPoints);
+    KDNode* kdTreeRoot = new KDNode(fullSet);  // Uses default depth=0, maxDepth=3, minPoints=10
+    sceneManager.push_back(kdTreeRoot);
+
+    // Trigger re-render
+    update();
 }
+
 
 //
 // controls radio button clicks
-//
+//constr
 void GLWidget::radioButtonClicked()
 {
     // TODO: toggle to

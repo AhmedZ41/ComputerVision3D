@@ -27,8 +27,10 @@ enum class SceneObjectType {ST_NONE                     [[maybe_unused]],   //
                             ST_CUBE                     [[maybe_unused]],   //
                             ST_PERSPECTIVE_CAMERA       [[maybe_unused]],   // perspective camera
                             ST_STEREO_CAMERA            [[maybe_unused]],   // stereo cameras
+                            ST_KD_TREE                  [[maybe_unused]],   // stereo cameras
                             ST_POINT_CLOUD              [[maybe_unused]],   // point cloud
                             ST_MaxSceneType             [[maybe_unused]]};
+
 
 class SceneObject
 {
@@ -44,5 +46,5 @@ public:
     virtual void affineMap(const QMatrix4x4&                        )       = 0;
     virtual void draw     (const RenderCamera&, const QColor&, float) const = 0;
 
-    SceneObjectType getType() const { return type; }
+    virtual SceneObjectType getType() const { return type; }
 };

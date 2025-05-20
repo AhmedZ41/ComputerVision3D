@@ -22,6 +22,8 @@ public:
     bool empty() const;
 
     PointSet extractSubsetInside(const QVector3D& minCorner, const QVector3D& maxCorner) const;
+    void affineMap(const QMatrix4x4& matrix);
+
 
 
 private:

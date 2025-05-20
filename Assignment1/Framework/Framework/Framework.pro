@@ -32,6 +32,7 @@ HEADERS += ./glwidget.h \
     Cube.h \
     Hexahedron.h \
     KDNode.h \
+    KDTree.h \
     KDUtils.h \
     Plane.h \
     PointSet.h \
@@ -52,6 +53,7 @@ SOURCES += ./glwidget.cpp \
     Cube.cpp \
     Hexahedron.cpp \
     KDNode.cpp \
+    KDTree.cpp \
     KDUtils.cpp \
     Plane.cpp \
     PointSet.cpp \

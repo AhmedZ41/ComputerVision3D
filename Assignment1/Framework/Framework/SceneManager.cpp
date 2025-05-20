@@ -27,10 +27,14 @@ void SceneManager::draw(const RenderCamera& renderer, const QColor& color) const
             case ST_POINT_CLOUD:
                 obj->draw(renderer,COLOR_POINT_CLOUD,3.0f);     // last argument unused
                 break;
+            case ST_KD_TREE:
+                obj->draw(renderer, QColor(100, 100, 255), 2.0f);  // draw kd-tree splitting planes
+                break;
+
 
 
             case ST_PERSPECTIVE_CAMERA:
-                obj->draw(renderer, COLOR_CAMERA, 2.0f);
+                //obj->draw(renderer, COLOR_CAMERA, 2.0f);
                 break;
                 // TODO: Assignement 1, Part 3
                 // This is the place to invoke the perspective camera's projection method and draw the projected objects.
@@ -38,7 +42,7 @@ void SceneManager::draw(const RenderCamera& renderer, const QColor& color) const
                 break;
 
             case ST_STEREO_CAMERA:
-                obj->draw(renderer, COLOR_CAMERA, 2.0f); // Part 2 draw call
+               // obj->draw(renderer, COLOR_CAMERA, 2.0f); // Part 2 draw call
                 break;
                 // TODO: Assignement 2, Part 1 - 3
                 // Part 1: This is the place to invoke the stereo camera's projection method and draw the projected objects.
