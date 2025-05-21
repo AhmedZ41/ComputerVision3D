@@ -30,6 +30,9 @@ void SceneManager::draw(const RenderCamera& renderer, const QColor& color) const
             case ST_KD_TREE:
                 obj->draw(renderer, QColor(100, 100, 255), 2.0f);  // draw kd-tree splitting planes
                 break;
+            case ST_OCTREE:
+                obj->draw(renderer, QColor(255, 165, 0), 1.0f); // Orange color
+                break;
 
 
 
