@@ -34,6 +34,7 @@ HEADERS += ./glwidget.h \
     KDNode.h \
     KDTree.h \
     KDUtils.h \
+    OCTreeNode.h \
     Plane.h \
     PointSet.h \
     RenderCamera.h \
@@ -55,6 +56,7 @@ SOURCES += ./glwidget.cpp \
     KDNode.cpp \
     KDTree.cpp \
     KDUtils.cpp \
+    OCTreeNode.cpp \
     Plane.cpp \
     PointSet.cpp \
     RenderCamera.cpp \
