@@ -36,6 +36,11 @@
 #include "Cube.h"
 #include "PerspectiveCamera.h"
 #include "StereoCamera.h"
+#include "KDNode.h"
+#include "PointSet.h"
+#include "KDTree.h"
+#include "OctreeNode.h"
+
 
 
 
@@ -61,9 +66,9 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //       Add here your own new 3d scene objects, e.g. cubes, hexahedra, etc.,
     //       analog to line 50 above and the respective Axes-class
     //
-    sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + E2, .5f));
-    sceneManager.push_back(new Cube(E0 + 9*E3 + -1*E1 + 1*E2, .5f));
-    sceneManager.push_back(new Cube(E0 + 5*E3 + -1*E1 + -0.5*E2, .5f));
+    //sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + E2, .5f));
+    //sceneManager.push_back(new Cube(E0 + 9*E3 + -1*E1 + 1*E2, .5f));
+    //sceneManager.push_back(new Cube(E0 + 5*E3 + -1*E1 + -0.5*E2, .5f));
     //sceneManager.push_back(new Cube(E0 + 5*E3 + -5*E1 + -0.5*E2, .5f));
 
 
@@ -108,7 +113,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
 
     // === Add second perspective camera ===
     auto cam2 = new PerspectiveCamera(
-        E0 - 10*E1 + 1*E3,                // position
+        E0 - 1*E1 + 1*E3,                // position
         QVector3D(0, 0, -1),             // view direction
         QVector3D(0, 1, 0),              // up vector
         2.0f, 1.5f, 1.5f                 // focal length, image plane size
@@ -121,7 +126,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
 
     QMatrix4x4 rotation;
     rotation.setToIdentity();
-    rotation.rotate(1.0f, QVector3D(0, 1, 0)); // 15° rotation around Y-axis
+    rotation.rotate(0.0f, QVector3D(0, 0, 0)); // 15° rotation around Y-axis
     cam2->affineMap(rotation);
     cam2->recomputeViewDirections(); // Update view direction after transform
 
@@ -165,7 +170,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     sceneManager.push_back(stereo);
 */
     auto stereo = new StereoCamera(cam, cam2);
-    stereo->reconstructFromStereo(3.0f); // 1° error
+    stereo->reconstructFromStereo(0.0f); // 1° error
     sceneManager.push_back(stereo);
 
     // === Project all cubes onto cam2's image plane ===
@@ -173,6 +178,61 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         if (s->getType() == SceneObjectType::ST_CUBE)
             cam2->addCube(*reinterpret_cast<Cube*>(s));
     }
+    /*
+    // ==== Load bunny and encapsulated KDTree into scene ====
+    auto* bunny = new PointCloud();
+    QString bunnyPath = "/Users/ahmedadnan/Desktop/HTWG/S6/Computervision-3D/ComputerVision3D/Assignment1/Framework/data/bunny.ply";
+    QFileInfo info(bunnyPath);
+    if (!info.exists()) {
+        qDebug() << "File does not exist:" << bunnyPath;
+    } else {
+        qDebug() << "Found bunny.ply at:" << info.absoluteFilePath();
+    }
+
+    if (bunny->loadPLY("/Users/ahmedadnan/Desktop/HTWG/S6/Computervision-3D/ComputerVision3D/Assignment1/Framework/data/bunny.ply")) {
+        bunny->setPointSize(unsigned(pointSize));
+        sceneManager.push_back(bunny);
+
+        // Encapsulated KDTree scene object
+        auto* tree = new KDTree(bunny);
+        sceneManager.push_back(tree);
+    }
+
+    */
+
+    // === Load bunny and build Octree ===
+    auto* bunnyOct = new PointCloud();
+    if (bunnyOct->loadPLY("/Users/ahmedadnan/Desktop/HTWG/S6/Computervision-3D/ComputerVision3D/Assignment1/Framework/data/bunny.ply")) {
+        bunnyOct->setPointSize(unsigned(pointSize));
+        sceneManager.push_back(bunnyOct);
+
+        // Compute actual bounding box from scaled points
+        QVector3D minCorner(std::numeric_limits<float>::max(),
+                            std::numeric_limits<float>::max(),
+                            std::numeric_limits<float>::max());
+
+        QVector3D maxCorner = -minCorner;
+
+        for (const auto& p : *bunnyOct) {
+            minCorner.setX(std::min(minCorner.x(), p.x()));
+            minCorner.setY(std::min(minCorner.y(), p.y()));
+            minCorner.setZ(std::min(minCorner.z(), p.z()));
+
+            maxCorner.setX(std::max(maxCorner.x(), p.x()));
+            maxCorner.setY(std::max(maxCorner.y(), p.y()));
+            maxCorner.setZ(std::max(maxCorner.z(), p.z()));
+        }
+
+        // Convert to QVector4D (homogeneous) format
+        QVector4D min(minCorner, 1.0f);
+        QVector4D max(maxCorner, 1.0f);
+
+        // Create and add Octree
+        auto* octree = new OctreeNode(*bunnyOct, min, max);
+        sceneManager.push_back(octree);
+    }
+
+
 
 }
 
@@ -334,6 +394,8 @@ void GLWidget::setPointSize(int size)
 // 2. opens file dialog
 // 3. loads ply-file data to new point cloud
 // 4. attaches new point cloud to scene management
+
+/*
 //
 void GLWidget::openFileDialog()
 {
@@ -350,11 +412,42 @@ void GLWidget::openFileDialog()
         return;
     }
     delete pointCloud;
+}*/
+
+void GLWidget::openFileDialog()
+{
+    const QString filePath = QFileDialog::getOpenFileName(this, tr("Open PLY file"), "../data", tr("PLY Files (*.ply)"));
+
+    if (filePath.isEmpty())
+        return;
+
+    // Load the point cloud
+    PointCloud* pointCloud = new PointCloud();
+    if (!pointCloud->loadPLY(filePath)) {
+        delete pointCloud;
+        return;
+    }
+
+    pointCloud->setPointSize(unsigned(pointSize));
+    sceneManager.push_back(pointCloud);
+
+    // ==== Build KD-tree ====
+    std::vector<QVector4D> rawPoints;
+    for (const auto& p : *pointCloud)
+        rawPoints.push_back(p);
+
+    PointSet fullSet(rawPoints);
+    KDNode* kdTreeRoot = new KDNode(fullSet);  // Uses default depth=0, maxDepth=3, minPoints=10
+    sceneManager.push_back(kdTreeRoot);
+
+    // Trigger re-render
+    update();
 }
+
 
 //
 // controls radio button clicks
-//
+//constr
 void GLWidget::radioButtonClicked()
 {
     // TODO: toggle to

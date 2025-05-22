@@ -216,3 +216,35 @@ void RenderCamera::renderPCL  (const QVector<QVector4D>& pcl,
     glEnd();
 }
 
+void RenderCamera::renderWireCube(const QVector3D& min,
+                                  const QVector3D& max,
+                                  const QColor& color,
+                                  float lineWidth) const
+{
+    QVector3D corners[8] = {
+        {min.x(), min.y(), min.z()},
+        {max.x(), min.y(), min.z()},
+        {max.x(), max.y(), min.z()},
+        {min.x(), max.y(), min.z()},
+        {min.x(), min.y(), max.z()},
+        {max.x(), min.y(), max.z()},
+        {max.x(), max.y(), max.z()},
+        {min.x(), max.y(), max.z()}
+    };
+
+    static const int edges[12][2] = {
+        {0,1}, {1,2}, {2,3}, {3,0},
+        {4,5}, {5,6}, {6,7}, {7,4},
+        {0,4}, {1,5}, {2,6}, {3,7}
+    };
+
+    glLineWidth(lineWidth);
+    glBegin(GL_LINES);
+    glColor3f(color);
+    for (const auto& edge : edges) {
+        glVertex3f(renderMatrix ^ corners[edge[0]]);
+        glVertex3f(renderMatrix ^ corners[edge[1]]);
+    }
+    glEnd();
+}
+

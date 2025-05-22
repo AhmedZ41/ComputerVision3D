@@ -31,7 +31,7 @@ void StereoCamera::affineMap(const QMatrix4x4& matrix) {
     for (auto cube : reconstructedCubes) {
         cube->affineMap(matrix);
     }
-}
+};
 
 
 // === Stereo reconstruction using triangulation (Part 2) ===

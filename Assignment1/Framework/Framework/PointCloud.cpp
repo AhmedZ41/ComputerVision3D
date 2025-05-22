@@ -87,6 +87,22 @@ bool PointCloud::loadPLY(const QString& filePath)
             a = pointsBoundMax[i]-pointsBoundMin[i];
             s+= a*a;
         }
+        // Recompute bounding box after scaling
+        pointsBoundMin = QVector3D( std::numeric_limits<float>::max(),
+                                   std::numeric_limits<float>::max(),
+                                   std::numeric_limits<float>::max());
+        pointsBoundMax = -pointsBoundMin;
+
+        for (const auto& p : *this) {
+            pointsBoundMin.setX(std::min(pointsBoundMin.x(), p.x()));
+            pointsBoundMin.setY(std::min(pointsBoundMin.y(), p.y()));
+            pointsBoundMin.setZ(std::min(pointsBoundMin.z(), p.z()));
+
+            pointsBoundMax.setX(std::max(pointsBoundMax.x(), p.x()));
+            pointsBoundMax.setY(std::max(pointsBoundMax.y(), p.y()));
+            pointsBoundMax.setZ(std::max(pointsBoundMax.z(), p.z()));
+        }
+
         s = sqrt(s)/pointCloudScale;
         for (auto& p: *this) { p /= s; p[3]=1.0; }
       //  for (int i=0; i < size(); i++) { (*this)[i]/=s; (*this)[i][3] = 1.0; }

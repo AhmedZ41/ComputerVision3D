@@ -59,9 +59,15 @@ SOURCES       = ../../glwidget.cpp \
 		../../GLConvenience.cpp \
 		../../QtConvenience.cpp \
 		../../Axes.cpp \
+		../../BoundingBox.cpp \
 		../../Cube.cpp \
 		../../Hexahedron.cpp \
+		../../KDNode.cpp \
+		../../KDTree.cpp \
+		../../KDUtils.cpp \
+		../../OctreeNode.cpp \
 		../../Plane.cpp \
+		../../PointSet.cpp \
 		../../RenderCamera.cpp \
 		../../SceneManager.cpp \
 		../../SceneObject.cpp \
@@ -76,9 +82,15 @@ OBJECTS       = debug/glwidget.o \
 		debug/GLConvenience.o \
 		debug/QtConvenience.o \
 		debug/Axes.o \
+		debug/BoundingBox.o \
 		debug/Cube.o \
 		debug/Hexahedron.o \
+		debug/KDNode.o \
+		debug/KDTree.o \
+		debug/KDUtils.o \
+		debug/OctreeNode.o \
 		debug/Plane.o \
+		debug/PointSet.o \
 		debug/RenderCamera.o \
 		debug/SceneManager.o \
 		debug/SceneObject.o \
@@ -341,9 +353,15 @@ DIST          = /Users/ahmedadnan/Qt/6.9.0/macos/mkspecs/features/spec_pre.prf \
 		../../GLConvenience.h \
 		../../QtConvenience.h \
 		../../Axes.h \
+		../../BoundingBox.h \
 		../../Cube.h \
 		../../Hexahedron.h \
+		../../KDNode.h \
+		../../KDTree.h \
+		../../KDUtils.h \
+		../../OctreeNode.h \
 		../../Plane.h \
+		../../PointSet.h \
 		../../RenderCamera.h \
 		../../SceneManager.h \
 		../../SceneObject.h \
@@ -355,9 +373,15 @@ DIST          = /Users/ahmedadnan/Qt/6.9.0/macos/mkspecs/features/spec_pre.prf \
 		../../GLConvenience.cpp \
 		../../QtConvenience.cpp \
 		../../Axes.cpp \
+		../../BoundingBox.cpp \
 		../../Cube.cpp \
 		../../Hexahedron.cpp \
+		../../KDNode.cpp \
+		../../KDTree.cpp \
+		../../KDUtils.cpp \
+		../../OctreeNode.cpp \
 		../../Plane.cpp \
+		../../PointSet.cpp \
 		../../RenderCamera.cpp \
 		../../SceneManager.cpp \
 		../../SceneObject.cpp \
@@ -920,8 +944,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../../glwidget.h ../../mainwindow.h ../../PointCloud.h ../../GLConvenience.h ../../QtConvenience.h ../../Axes.h ../../Cube.h ../../Hexahedron.h ../../Plane.h ../../RenderCamera.h ../../SceneManager.h ../../SceneObject.h ../../StereoCamera.h ../../perspectivecamera.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../glwidget.cpp ../../mainwindow.cpp ../../main.cpp ../../PointCloud.cpp ../../GLConvenience.cpp ../../QtConvenience.cpp ../../Axes.cpp ../../Cube.cpp ../../Hexahedron.cpp ../../Plane.cpp ../../RenderCamera.cpp ../../SceneManager.cpp ../../SceneObject.cpp ../../StereoCamera.cpp ../../perspectivecamera.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../glwidget.h ../../mainwindow.h ../../PointCloud.h ../../GLConvenience.h ../../QtConvenience.h ../../Axes.h ../../BoundingBox.h ../../Cube.h ../../Hexahedron.h ../../KDNode.h ../../KDTree.h ../../KDUtils.h ../../OctreeNode.h ../../Plane.h ../../PointSet.h ../../RenderCamera.h ../../SceneManager.h ../../SceneObject.h ../../StereoCamera.h ../../perspectivecamera.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../glwidget.cpp ../../mainwindow.cpp ../../main.cpp ../../PointCloud.cpp ../../GLConvenience.cpp ../../QtConvenience.cpp ../../Axes.cpp ../../BoundingBox.cpp ../../Cube.cpp ../../Hexahedron.cpp ../../KDNode.cpp ../../KDTree.cpp ../../KDUtils.cpp ../../OctreeNode.cpp ../../Plane.cpp ../../PointSet.cpp ../../RenderCamera.cpp ../../SceneManager.cpp ../../SceneObject.cpp ../../StereoCamera.cpp ../../perspectivecamera.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../mainwindow.ui $(DISTDIR)/
 
 
@@ -1170,7 +1194,11 @@ debug/glwidget.o: ../../glwidget.cpp ../../glwidget.h \
 		../../Hexahedron.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
 		../../PerspectiveCamera.h \
-		../../StereoCamera.h
+		../../StereoCamera.h \
+		../../KDNode.h \
+		../../PointSet.h \
+		../../KDTree.h \
+		../../OctreeNode.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/glwidget.o ../../glwidget.cpp
 
 debug/mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
@@ -1471,6 +1499,12 @@ debug/Axes.o: ../../Axes.cpp ../../Axes.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvectornd.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/Axes.o ../../Axes.cpp
 
+debug/BoundingBox.o: ../../BoundingBox.cpp ../../BoundingBox.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvectornd.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector3D
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/BoundingBox.o ../../BoundingBox.cpp
+
 debug/Cube.o: ../../Cube.cpp ../../Cube.h \
 		../../Hexahedron.h \
 		../../SceneObject.h \
@@ -1609,6 +1643,58 @@ debug/Hexahedron.o: ../../Hexahedron.cpp ../../Hexahedron.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/Hexahedron.o ../../Hexahedron.cpp
 
+debug/KDNode.o: ../../KDNode.cpp ../../RenderCamera.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtCore.framework/Headers/QObject \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtCore.framework/Headers/qobject.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QMatrix4x4 \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qmatrix4x4.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector3D \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvectornd.h \
+		../../KDNode.h \
+		../../PointSet.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
+		../../SceneObject.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QColor \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qcolor.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/KDNode.o ../../KDNode.cpp
+
+debug/KDTree.o: ../../KDTree.cpp ../../KDTree.h \
+		../../SceneObject.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QColor \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qcolor.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QMatrix4x4 \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qmatrix4x4.h \
+		../../RenderCamera.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtCore.framework/Headers/QObject \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtCore.framework/Headers/qobject.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector3D \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvectornd.h \
+		../../KDNode.h \
+		../../PointSet.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
+		../../PointCloud.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/KDTree.o ../../KDTree.cpp
+
+debug/KDUtils.o: ../../KDUtils.cpp ../../KDUtils.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvectornd.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/KDUtils.o ../../KDUtils.cpp
+
+debug/OctreeNode.o: ../../OctreeNode.cpp ../../OctreeNode.h \
+		../../SceneObject.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QColor \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qcolor.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QMatrix4x4 \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qmatrix4x4.h \
+		../../RenderCamera.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtCore.framework/Headers/QObject \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtCore.framework/Headers/qobject.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector3D \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvectornd.h \
+		../../PointSet.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/OctreeNode.o ../../OctreeNode.cpp
+
 debug/Plane.o: ../../Plane.cpp ../../Plane.h \
 		../../SceneObject.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QColor \
@@ -1730,6 +1816,13 @@ debug/Plane.o: ../../Plane.cpp ../../Plane.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
 		../../QtConvenience.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/Plane.o ../../Plane.cpp
+
+debug/PointSet.o: ../../PointSet.cpp ../../PointSet.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvectornd.h \
+		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector3D \
+		../../BoundingBox.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/PointSet.o ../../PointSet.cpp
 
 debug/RenderCamera.o: ../../RenderCamera.cpp ../../RenderCamera.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtCore.framework/Headers/QObject \
@@ -1880,6 +1973,7 @@ debug/StereoCamera.o: ../../StereoCamera.cpp ../../StereoCamera.h \
 		../../PerspectiveCamera.h \
 		../../Axes.h \
 		../../Plane.h \
+		../../SceneManager.h \
 		../../Cube.h \
 		../../Hexahedron.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QVector4D \
@@ -2005,6 +2099,7 @@ debug/perspectivecamera.o: ../../perspectivecamera.cpp ../../PerspectiveCamera.h
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qvectornd.h \
 		../../Axes.h \
 		../../Plane.h \
+		../../SceneManager.h \
 		../../GLConvenience.h \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/QtGui \
 		/Users/ahmedadnan/Qt/6.9.0/macos/lib/QtGui.framework/Headers/qtguiglobal.h \

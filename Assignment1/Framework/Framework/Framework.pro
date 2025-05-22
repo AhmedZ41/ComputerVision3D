@@ -28,9 +28,15 @@ HEADERS += ./glwidget.h \
     ./GLConvenience.h \
     ./QtConvenience.h \
     Axes.h \
+    BoundingBox.h \
     Cube.h \
     Hexahedron.h \
+    KDNode.h \
+    KDTree.h \
+    KDUtils.h \
+    OctreeNode.h \
     Plane.h \
+    PointSet.h \
     RenderCamera.h \
     SceneManager.h \
     SceneObject.h \
@@ -44,9 +50,15 @@ SOURCES += ./glwidget.cpp \
     ./GLConvenience.cpp \
     ./QtConvenience.cpp \
     Axes.cpp \
+    BoundingBox.cpp \
     Cube.cpp \
     Hexahedron.cpp \
+    KDNode.cpp \
+    KDTree.cpp \
+    KDUtils.cpp \
+    OctreeNode.cpp \
     Plane.cpp \
+    PointSet.cpp \
     RenderCamera.cpp \
     SceneManager.cpp \
     SceneObject.cpp \
