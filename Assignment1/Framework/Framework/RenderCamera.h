@@ -44,6 +44,11 @@ public:
   void renderPCL  (const QVector<QVector4D>& pcl,   // render point cloud of homogeneous points
                    const QColor&             color,
                    float                     pointSize=3.0f) const;
+  void renderWireCube(const QVector3D& minCorner,
+                      const QVector3D& maxCorner,
+                      const QColor& color,
+                      float lineWidth = 1.0f) const;
+
 
   // methods for render camera navigation
   void setup   ();

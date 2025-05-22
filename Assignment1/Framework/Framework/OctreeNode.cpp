@@ -1,79 +1,63 @@
 #include "OctreeNode.h"
-#include "RenderCamera.h"
-#include <QColor>
 
-OctreeNode::OctreeNode(const PointSet& pointSet, int d, int maxDepth)
-    : data(pointSet), depth(d)
+OctreeNode::OctreeNode(const QVector<QVector4D>& points,
+                       const QVector4D& minCorner,
+                       const QVector4D& maxCorner,
+                       int depth)
 {
-    type = SceneObjectType::ST_OCTREE;
-    minCorner = data.getMinCorner();
-    maxCorner = data.getMaxCorner();
+    type = SceneObjectType::ST_CUBE;
+    bboxMin = minCorner;
+    bboxMax = maxCorner;
     children.fill(nullptr);
 
-    if (depth < maxDepth && data.size() > 1) {
-        buildChildren(maxDepth);
+    if (depth >= 3 || points.size() < 20) return;
+
+    QVector<QVector4D> childPoints[8];
+    QVector4D mid = 0.5f * (bboxMin + bboxMax);
+
+    for (const auto& p : points) {
+        int index = (p.x() > mid.x()) + 2 * (p.y() > mid.y()) + 4 * (p.z() > mid.z());
+        childPoints[index].push_back(p);
+    }
+
+    for (int i = 0; i < 8; ++i) {
+        QVector4D childMin = bboxMin;
+        QVector4D childMax = mid;
+        if (i & 1) { childMin.setX(mid.x()); childMax.setX(bboxMax.x()); }
+        if (i & 2) { childMin.setY(mid.y()); childMax.setY(bboxMax.y()); }
+        if (i & 4) { childMin.setZ(mid.z()); childMax.setZ(bboxMax.z()); }
+
+        if (!childPoints[i].isEmpty())
+            children[i] = new OctreeNode(childPoints[i], childMin, childMax, depth + 1);
     }
 }
 
 OctreeNode::~OctreeNode() {
-    for (auto child : children)
+    for (auto* child : children)
         delete child;
 }
 
-void OctreeNode::buildChildren(int maxDepth) {
-    QVector3D center = (minCorner + maxCorner) * 0.5f;
+void OctreeNode::draw(const RenderCamera& camera, const QColor& baseColor, float lineWidth) const {
+    // Determine current depth
+    static int currentDepth = 0;
 
-    std::vector<QVector4D> allPoints = data.getPoints();
-    std::array<std::vector<QVector4D>, 8> octantPoints;
-
-    // Assign points to 1 of 8 octants
-    for (const auto& p : allPoints) {
-        int index = 0;
-        if (p.x() > center.x()) index |= 1;
-        if (p.y() > center.y()) index |= 2;
-        if (p.z() > center.z()) index |= 4;
-        octantPoints[index].push_back(p);
+    // Assign color based on depth: X → red, Y → green, Z → blue
+    QColor color;
+    switch (currentDepth % 3) {
+    case 0: color = QColor(255, 0, 0); break;   // X axis split: red
+    case 1: color = QColor(0, 255, 0); break;   // Y axis split: green
+    case 2: color = QColor(0, 0, 255); break;   // Z axis split: blue
     }
 
-    // Recursively build children
-    for (int i = 0; i < 8; ++i) {
-        if (!octantPoints[i].empty()) {
-            children[i] = new OctreeNode(PointSet(octantPoints[i]), depth + 1, maxDepth);
-        }
+    camera.renderWireCube(bboxMin.toVector3D(), bboxMax.toVector3D(), color, lineWidth);
+
+    currentDepth++;
+    for (const auto* child : children) {
+        if (child) child->draw(camera, color, lineWidth);
     }
+    currentDepth--;
 }
 
-void OctreeNode::draw(const RenderCamera& renderer, const QColor& color, float lineWidth) const {
-    if (depth >= 3) return;  // Only visualize first 3 levels
 
-    // draw bounding box
-    QVector3D a(minCorner.x(), minCorner.y(), minCorner.z());
-    QVector3D b(maxCorner.x(), minCorner.y(), minCorner.z());
-    QVector3D c(maxCorner.x(), maxCorner.y(), minCorner.z());
-    QVector3D d(minCorner.x(), maxCorner.y(), minCorner.z());
-    QVector3D e(minCorner.x(), minCorner.y(), maxCorner.z());
-    QVector3D f(maxCorner.x(), minCorner.y(), maxCorner.z());
-    QVector3D g(maxCorner.x(), maxCorner.y(), maxCorner.z());
-    QVector3D h(minCorner.x(), maxCorner.y(), maxCorner.z());
-
-    std::vector<std::pair<QVector3D, QVector3D>> edges = {
-        {a,b},{b,c},{c,d},{d,a},
-        {e,f},{f,g},{g,h},{h,e},
-        {a,e},{b,f},{c,g},{d,h}
-    };
-
-    for (const auto& edge : edges)
-        renderer.renderLine(edge.first, edge.second, color, lineWidth);
-
-    // draw children
-    for (auto child : children)
-        if (child) child->draw(renderer, color, lineWidth);
-}
-
-void OctreeNode::affineMap(const QMatrix4x4& matrix) {
-    data.affineMap(matrix);
-    minCorner = matrix * minCorner;
-    maxCorner = matrix * maxCorner;
-    for (auto child : children)
-        if (child) child->affineMap(matrix);
+void OctreeNode::affineMap(const QMatrix4x4&) {
 }

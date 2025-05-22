@@ -39,6 +39,7 @@
 #include "KDNode.h"
 #include "PointSet.h"
 #include "KDTree.h"
+#include "OctreeNode.h"
 
 
 
@@ -65,9 +66,9 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //       Add here your own new 3d scene objects, e.g. cubes, hexahedra, etc.,
     //       analog to line 50 above and the respective Axes-class
     //
-    sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + E2, .5f));
-    sceneManager.push_back(new Cube(E0 + 9*E3 + -1*E1 + 1*E2, .5f));
-    sceneManager.push_back(new Cube(E0 + 5*E3 + -1*E1 + -0.5*E2, .5f));
+    //sceneManager.push_back(new Cube(E0 + 6*E3 + E1 + E2, .5f));
+    //sceneManager.push_back(new Cube(E0 + 9*E3 + -1*E1 + 1*E2, .5f));
+    //sceneManager.push_back(new Cube(E0 + 5*E3 + -1*E1 + -0.5*E2, .5f));
     //sceneManager.push_back(new Cube(E0 + 5*E3 + -5*E1 + -0.5*E2, .5f));
 
 
@@ -177,6 +178,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         if (s->getType() == SceneObjectType::ST_CUBE)
             cam2->addCube(*reinterpret_cast<Cube*>(s));
     }
+    /*
     // ==== Load bunny and encapsulated KDTree into scene ====
     auto* bunny = new PointCloud();
     QString bunnyPath = "/Users/ahmedadnan/Desktop/HTWG/S6/Computervision-3D/ComputerVision3D/Assignment1/Framework/data/bunny.ply";
@@ -195,6 +197,42 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         auto* tree = new KDTree(bunny);
         sceneManager.push_back(tree);
     }
+
+    */
+
+    // === Load bunny and build Octree ===
+    auto* bunnyOct = new PointCloud();
+    if (bunnyOct->loadPLY("/Users/ahmedadnan/Desktop/HTWG/S6/Computervision-3D/ComputerVision3D/Assignment1/Framework/data/bunny.ply")) {
+        bunnyOct->setPointSize(unsigned(pointSize));
+        sceneManager.push_back(bunnyOct);
+
+        // Compute actual bounding box from scaled points
+        QVector3D minCorner(std::numeric_limits<float>::max(),
+                            std::numeric_limits<float>::max(),
+                            std::numeric_limits<float>::max());
+
+        QVector3D maxCorner = -minCorner;
+
+        for (const auto& p : *bunnyOct) {
+            minCorner.setX(std::min(minCorner.x(), p.x()));
+            minCorner.setY(std::min(minCorner.y(), p.y()));
+            minCorner.setZ(std::min(minCorner.z(), p.z()));
+
+            maxCorner.setX(std::max(maxCorner.x(), p.x()));
+            maxCorner.setY(std::max(maxCorner.y(), p.y()));
+            maxCorner.setZ(std::max(maxCorner.z(), p.z()));
+        }
+
+        // Convert to QVector4D (homogeneous) format
+        QVector4D min(minCorner, 1.0f);
+        QVector4D max(maxCorner, 1.0f);
+
+        // Create and add Octree
+        auto* octree = new OctreeNode(*bunnyOct, min, max);
+        sceneManager.push_back(octree);
+    }
+
+
 
 }
 
