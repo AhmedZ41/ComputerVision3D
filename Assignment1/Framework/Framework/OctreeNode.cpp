@@ -10,7 +10,7 @@ OctreeNode::OctreeNode(const QVector<QVector4D>& points,
                        int depth)
 {
     // Set the scene object type so that SceneManager can recognize it
-    type = SceneObjectType::ST_CUBE;
+    type = SceneObjectType::ST_OCTREE;
 
     // Store bounding box
     bboxMin = minCorner;
@@ -70,7 +70,7 @@ void OctreeNode::draw(const RenderCamera& camera, const QColor& baseColor, float
     case 2: color = QColor(0, 0, 255); break;   // Blue → Z-split
     }
 
-    // Draw this node’s bounding box
+    // Draw this node's bounding box
     camera.renderWireCube(bboxMin.toVector3D(), bboxMax.toVector3D(), color, lineWidth);
 
     // Recursively draw all children

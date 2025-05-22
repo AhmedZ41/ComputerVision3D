@@ -267,7 +267,19 @@ void GLWidget::paintGL()
 {
     renderer->setup();
 
-    sceneManager.draw(*renderer,COLOR_SCENE);
+    // Draw scene objects based on visibility flags
+    for (auto obj : sceneManager) {
+        // Skip KD-tree if not visible
+        if (obj->getType() == SceneObjectType::ST_KD_TREE && !showKDTree) {
+            continue;
+        }
+        // Skip Octree if not visible
+        if (obj->getType() == SceneObjectType::ST_OCTREE && !showOctree) {
+            continue;
+        }
+        // Draw all other objects normally
+        obj->draw(*renderer, COLOR_SCENE, 1.0f);
+    }
 }
 
 //
@@ -314,6 +326,16 @@ void GLWidget::keyPressEvent(QKeyEvent * event)
 {
     switch ( event->key() )
     {
+        // Toggle KD-tree with 'k'
+    case Key_K:
+        showKDTree = !showKDTree;
+        showOctree = false;  // Ensure only one visualization is active
+        break;
+        // Toggle Octree with single 'o' press
+    case Key_O:
+        showOctree = !showOctree;
+        showKDTree = false;  // Ensure only one visualization is active
+        break;
         // trigger translation of renderer using keyboard
     case Key_4:
     case Key_Left:     renderer->left    (); break;
