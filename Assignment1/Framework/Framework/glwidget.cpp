@@ -178,7 +178,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         if (s->getType() == SceneObjectType::ST_CUBE)
             cam2->addCube(*reinterpret_cast<Cube*>(s));
     }
-    /*
+
     // ==== Load bunny and encapsulated KDTree into scene ====
     auto* bunny = new PointCloud();
     QString bunnyPath = "/Users/ahmedadnan/Desktop/HTWG/S6/Computervision-3D/ComputerVision3D/Assignment1/Framework/data/bunny.ply";
@@ -198,7 +198,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         sceneManager.push_back(tree);
     }
 
-    */
+
 
     // === Load bunny and build Octree ===
     auto* bunnyOct = new PointCloud();
