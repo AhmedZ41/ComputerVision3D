@@ -37,6 +37,7 @@
 #include "Hexahedron.h"
 #include "PerspectiveCamera.h"
 #include "StereoCamera.h"
+#include "KDTree.h"
 
 using namespace std;
 using namespace Qt;
@@ -52,41 +53,65 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent), pointSize(5)
     connect(renderer, &RenderCamera::changed, this, &GLWidget::onRendererChanged);
 
     // setup the scene
-    sceneManager.push_back(new Axes(E0, QMatrix4x4()));  // the global world coordinate system
-    //sceneManager.push_back(new Plane(E0 + 4 * E3, -E3)); // some plane
+    // sceneManager.push_back(new Axes(E0, QMatrix4x4())); // the global world coordinate system
+    // // sceneManager.push_back(new Plane(E0 + 4 * E3, -E3)); // some plane
 
-    // TODO: Assignment 1, Part 1
-    // Add here your own new 3d scene objects, e.g. cubes, hexahedra, etc.,
-    // analog to line 50 above and the respective Axes-class
-    //sceneManager.push_back(new Cube(QVector4D(1, 1, 0, 1), 1.0f));         // cube left
-    sceneManager.push_back(new Cube(QVector4D(1, 2, -4, 1), 1.2f));
-    sceneManager.push_back(new Cube(QVector4D(0, 1, -3, 1), 0.8f));
-    sceneManager.push_back(new Cube(QVector4D(2, 1.3, -3.5, 1), 0.4f));
-    //sceneManager.push_back(new Hexahedron(QVector4D(2, 0.5, -0.5, 1), 1, 1, 1)); // more back
+    // // TODO: Assignment 1, Part 1
+    // // Add here your own new 3d scene objects, e.g. cubes, hexahedra, etc.,
+    // // analog to line 50 above and the respective Axes-class
+    // // sceneManager.push_back(new Cube(QVector4D(1, 1, 0, 1), 1.0f));         // cube left
+    // sceneManager.push_back(new Cube(QVector4D(1, 0, -1, 1), 0.8f));
+    // sceneManager.push_back(new Cube(QVector4D(0, 1, -3, 1), 0.8f));
+    // sceneManager.push_back(new Cube(QVector4D(2, 1.3, -3.5, 1), 0.4f));
+    // // sceneManager.push_back(new Hexahedron(QVector4D(2, 0.5, -0.5, 1), 1, 1, 1)); // more back
 
-    // First perspective camera
-    QMatrix4x4 camRotation;
-    camRotation.setToIdentity(); // ggf. noch drehen
-    QVector4D camPosition = E1 + E2 + 3.0f * E3;
-    float focalLength = 1.0f;
-    float fovY = 54.0f;
-    float aspectRatio = 16/9;
+    // // First perspective camera
+    // QMatrix4x4 camRotation;
+    // camRotation.setToIdentity(); // ggf. noch drehen
+    // QVector4D camPosition = E1 + E2 + 3.0f * E3;
+    // float focalLength = 1.0f;
+    // float fovY = 54.0f;
+    // float aspectRatio = 16 / 9;
 
-    PerspectiveCamera camL(camPosition, camRotation, focalLength, fovY, aspectRatio);;
-    PerspectiveCamera camR(camPosition + QVector4D(1.0f, 0, 0, 0), camRotation, focalLength, fovY, aspectRatio);
-    sceneManager.push_back(new StereoCamera(camL, camR));
+    // PerspectiveCamera camL(camPosition, camRotation, focalLength, fovY, aspectRatio);
+    // PerspectiveCamera camR(camPosition + QVector4D(1.3f, 0, 0, 0), camRotation, focalLength, fovY, aspectRatio);
+    // sceneManager.push_back(new StereoCamera(camL, camR));
 
-    // TODO: Assignement 2, Part 1 - 3
-    //       Add here your own new scene object that represents a stereo camera pair.
-    //       - Part 1: Its draw-method should draw all relevant parameters of both cameras, e.g. image planes, view axes, etc.
-    //       - Part 1: Its projection method should project the other scene objects onto their image planes
-    //         and draw the projected objects.
-    //       - Part 2: Its reconstruction method should reconstruct the 3d geometry of the other scene objects from their stereo projections.
-    //       - Part 3: Its reconstruction method should reconstruct the 3d geometry of the other scene objects from misaligned stereo projections.
-    //       - This has to be used in Scene.cpp/Scene::draw.
-    //
+    loadModel("C:/Users/mohsa/Github/ComputerVision3D/Windows/Framework/data/bunny.ply");
+}
 
+void GLWidget::loadModel(const QString &path)
+{
+    auto *pointCloud = new PointCloud();
 
+    pointCloud->setTreeType(PointCloud::TreeType::KD);
+
+    QString modelPath = path;
+    QFileInfo info(modelPath);
+
+    if (info.exists() && pointCloud->loadPLY(modelPath))
+    {
+        pointCloud->setPointSize(pointSize);
+
+        // Add both the point cloud and its spatial tree visualization to the scene
+        sceneManager.push_back(pointCloud);
+        sceneManager.push_back(pointCloud->getSpatialTree());
+
+        // Show how we can use the KDTree for spatial queries
+        QVector4D queryPoint(0, 0, 0, 1);
+        QVector4D nearestPoint = pointCloud->findNearestPoint(queryPoint);
+
+        // Example of using KDTree for range search
+        float searchRadius = 0.3f;
+        std::vector<QVector4D> pointsInRange = pointCloud->findPointsInRadius(queryPoint, searchRadius);
+
+        // Print the number of points in range
+        qDebug() << "points in range of " << queryPoint << " with radius " << searchRadius << " are: " << pointsInRange.size();
+    }
+    else
+    {
+        qDebug() << "File does not exist:" << modelPath;
+    }
 }
 
 //
@@ -116,7 +141,7 @@ void GLWidget::initializeGL()
 //
 void GLWidget::paintGL()
 {
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // dunkles Grau
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);                                       // dunkles Grau
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // ← Wichtig!
 
     renderer->setup();

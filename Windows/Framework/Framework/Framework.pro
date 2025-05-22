@@ -28,11 +28,14 @@ HEADERS += ./glwidget.h \
     Axes.h \
     Cube.h \
     Hexahedron.h \
+    KDTree.h \
+    OctTree.h \
     PerspectiveCamera.h \
     Plane.h \
     RenderCamera.h \
     SceneManager.h \
     SceneObject.h \
+    SpatialTree.h \
     StereoCamera.h
 
 SOURCES += ./glwidget.cpp \
@@ -44,11 +47,14 @@ SOURCES += ./glwidget.cpp \
     Axes.cpp \
     Cube.cpp \
     Hexahedron.cpp \
+    KDTree.cpp \
+    OctTree.cpp \
     PerspectiveCamera.cpp \
     Plane.cpp \
     RenderCamera.cpp \
     SceneManager.cpp \
     SceneObject.cpp \
+    SpatialTree.cpp \
     StereoCamera.cpp
 
 FORMS += ./mainwindow.ui

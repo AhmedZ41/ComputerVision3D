@@ -113,7 +113,7 @@ void StereoCamera::reconstruct(const std::vector<SceneObject*>& scene)
 
     // baseline
     float baseline = QVector3D::dotProduct(oR - oL, cxL);
-    const float depthScale = 0.4f;
+    const float depthScale = 1.0f;
 
     // Max error threshold for coloring
     const float maxErrorThreshold = 0.1f;

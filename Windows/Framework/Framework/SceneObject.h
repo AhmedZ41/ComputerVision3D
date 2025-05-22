@@ -12,23 +12,28 @@
 #include "RenderCamera.h"
 
 // some predefined colors
-[[maybe_unused]] const QColor COLOR_AXES           = QColor(255,  0,  0);
-[[maybe_unused]] const QColor COLOR_PLANE          = QColor(255,255,  0);
-[[maybe_unused]] const QColor COLOR_SCENE          = QColor(  0,255,  0);
-[[maybe_unused]] const QColor COLOR_RECONSTRUCTION = QColor(255,  0,  0);
-[[maybe_unused]] const QColor COLOR_CAMERA         = QColor(255,  0,  0);
-[[maybe_unused]] const QColor COLOR_POINT_CLOUD    = QColor(255,255,255);
+[[maybe_unused]] const QColor COLOR_AXES = QColor(255, 0, 0);
+[[maybe_unused]] const QColor COLOR_PLANE = QColor(255, 255, 0);
+[[maybe_unused]] const QColor COLOR_SCENE = QColor(0, 255, 0);
+[[maybe_unused]] const QColor COLOR_RECONSTRUCTION = QColor(255, 0, 0);
+[[maybe_unused]] const QColor COLOR_CAMERA = QColor(255, 0, 0);
+[[maybe_unused]] const QColor COLOR_POINT_CLOUD = QColor(255, 255, 255);
+[[maybe_unused]] const QColor COLOR_TREE = QColor(0, 200, 255);
 
 // some example object types, that you might use
-enum class SceneObjectType {ST_NONE                     [[maybe_unused]],   //
-                            ST_PLANE                    [[maybe_unused]],   //
-                            ST_AXES                     [[maybe_unused]],   // coordinate systems
-                            ST_HEXAHEDRON               [[maybe_unused]],   //
-                            ST_CUBE                     [[maybe_unused]],   //
-                            ST_PERSPECTIVE_CAMERA       [[maybe_unused]],   // perspective camera
-                            ST_STEREO_CAMERA            [[maybe_unused]],   // stereo cameras
-                            ST_POINT_CLOUD              [[maybe_unused]],   // point cloud
-                            ST_MaxSceneType             [[maybe_unused]]};
+enum class SceneObjectType
+{
+    ST_NONE [[maybe_unused]],               //
+    ST_PLANE [[maybe_unused]],              //
+    ST_AXES [[maybe_unused]],               // coordinate systems
+    ST_HEXAHEDRON [[maybe_unused]],         //
+    ST_CUBE [[maybe_unused]],               //
+    ST_PERSPECTIVE_CAMERA [[maybe_unused]], // perspective camera
+    ST_STEREO_CAMERA [[maybe_unused]],      // stereo cameras
+    ST_POINT_CLOUD [[maybe_unused]],        // point cloud
+    ST_TREE [[maybe_unused]],               // kdtree visualization
+    ST_MaxSceneType [[maybe_unused]]
+};
 
 class SceneObject
 {
@@ -36,13 +41,13 @@ protected:
     SceneObjectType type;
 
 public:
-    SceneObject(                      ): type(SceneObjectType::ST_NONE) {}
-    SceneObject(const SceneObject&  so): type(            so.getType()) {}
-    SceneObject(const SceneObject&& so): type(            so.getType()) {}
-    virtual ~SceneObject()  {}
+    SceneObject() : type(SceneObjectType::ST_NONE) {}
+    SceneObject(const SceneObject &so) : type(so.getType()) {}
+    SceneObject(const SceneObject &&so) : type(so.getType()) {}
+    virtual ~SceneObject() {}
 
-    virtual void affineMap(const QMatrix4x4&                        )       = 0;
-    virtual void draw     (const RenderCamera&, const QColor&, float) const = 0;
+    virtual void affineMap(const QMatrix4x4 &) = 0;
+    virtual void draw(const RenderCamera &, const QColor &, float) const = 0;
 
     virtual std::vector<QVector4D> getPoints() const = 0;
 
