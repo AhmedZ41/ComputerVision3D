@@ -13,6 +13,7 @@ public:
 
     void draw(const RenderCamera& camera, const QColor& color = Qt::green, float lineWidth = 1.0f) const override;
     void affineMap(const QMatrix4x4& matrix) override;
+    SceneObjectType getType() const override { return SceneObjectType::ST_OCTREE; }
 
 private:
     QVector4D bboxMin, bboxMax;

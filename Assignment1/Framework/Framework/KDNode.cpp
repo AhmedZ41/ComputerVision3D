@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <QColor>
 
-
+//build kdnore recursilvely
 KDNode::KDNode(const PointSet& pointSet, int depth, int maxDepth, int minPoints)
     : data(pointSet)
 {
@@ -36,6 +36,7 @@ KDNode::KDNode(const PointSet& pointSet, int depth, int maxDepth, int minPoints)
     if (!rightPoints.empty()) right = new KDNode(PointSet(rightPoints), depth + 1, maxDepth, minPoints);
 }
 
+//destructor
 KDNode::~KDNode() {
     delete left;
     delete right;
@@ -43,6 +44,7 @@ KDNode::~KDNode() {
 
 
 void KDNode::draw(const RenderCamera& renderer, const QColor& color, float lineWidth, int currentDepth) const {
+
     if (currentDepth >= 3) return; // only draw first 3 levels
 
     auto minC = data.getMinCorner();
@@ -81,7 +83,7 @@ void KDNode::affineMap(const QMatrix4x4& matrix) {
     if (right) right->affineMap(matrix);
 }
 
-// This is the base-class-required draw method
+// This is the base class required draw method
 void KDNode::draw(const RenderCamera& renderer, const QColor& color, float lineWidth) const {
     draw(renderer, color, lineWidth, 0);  // Call recursive one with default depth = 0
 }

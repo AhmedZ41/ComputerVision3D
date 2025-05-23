@@ -18,6 +18,8 @@ private:
     // scene and scene control
     int           pointSize;
     SceneManager  sceneManager;
+    bool          showKDTree = false;
+    bool          showOctree = false;
 
 public:
     GLWidget(QWidget* parent = nullptr);
