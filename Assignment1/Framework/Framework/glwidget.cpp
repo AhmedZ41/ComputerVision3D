@@ -64,7 +64,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     connect(renderer, &RenderCamera::changed, this, &GLWidget::onRendererChanged);
 
     // setup the scene
-    sceneManager.push_back(new Axes(E0,QMatrix4x4()));    // the global world coordinate system
+    //sceneManager.push_back(new Axes(E0,QMatrix4x4()));    // the global world coordinate system
     // sceneManager.push_back(new Plane(E0+4*E3,-E3));       // some plane
 
     // TODO: Assignment 1, Part 1
@@ -84,6 +84,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //       Its draw-method should draw all relevant camera parameters, e.g. image plane, view axes, etc
 
     //
+    /*
     auto cam = new PerspectiveCamera(E0 + 2*E1+ 1*E3,
                                      QVector3D(0, 0, -1),
                                      QVector3D(0, 1, 0),
@@ -91,20 +92,21 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
                                      1.5f, 1.5f);
 
     sceneManager.push_back(cam);
+    */
 
     // TODO: Assignement 1, Part 3
     //       Add to your perspective camera methods to project the other scene objects onto its image plane
     //       and to draw the projected objects. These methods have to be invoked in Scene.cpp/Scene::draw.
     //
 
-
+/*
     // Add all existing cubes to camera for projection
     for (auto s : sceneManager) {
         if (s->getType() == SceneObjectType::ST_CUBE) {
             cam->addCube(*reinterpret_cast<Cube*>(s));
         }
     }
-
+*/
 
     // TODO: Assignement 2, Part 1 - 3
     //       Add here your own new scene object that represents a stereo camera pair.
@@ -117,6 +119,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //
 
     // === Add second perspective camera ===
+    /*
     auto cam2 = new PerspectiveCamera(
         E0 - 1*E1 + 1*E3,                // position
         QVector3D(0, 0, -1),             // view direction
@@ -124,11 +127,11 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         2.0f, 1.5f, 1.5f                 // focal length, image plane size
         );
     sceneManager.push_back(cam2);
-
+*/
 
 
     // === Simulate camera misalignment (Part 3) ===
-
+/*
     QMatrix4x4 rotation;
     rotation.setToIdentity();
     rotation.rotate(0.0f, QVector3D(0, 0, 0)); // 15° rotation around Y-axis
@@ -144,7 +147,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
             cam2->addCube(*reinterpret_cast<Cube*>(s));
     }
 
-
+*/
 
 
     // === Manual triangulation & display (used for debugging) ===
@@ -174,6 +177,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     stereo->reconstructFromStereo();
     sceneManager.push_back(stereo);
 */
+/*
     auto stereo = new StereoCamera(cam, cam2);
     stereo->reconstructFromStereo(0.0f); // 1° error
     sceneManager.push_back(stereo);
@@ -183,6 +187,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         if (s->getType() == SceneObjectType::ST_CUBE)
             cam2->addCube(*reinterpret_cast<Cube*>(s));
     }
+            */
 
     // ==== Load bunny and encapsulated KDTree into scene ====
     auto* bunny = new PointCloud();
