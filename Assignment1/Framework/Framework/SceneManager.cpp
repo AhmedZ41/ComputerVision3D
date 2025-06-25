@@ -25,7 +25,7 @@ void SceneManager::draw(const RenderCamera& renderer, const QColor& color) const
                 obj->draw(renderer,color,2.0f);
                 break;
             case ST_POINT_CLOUD:
-                obj->draw(renderer,COLOR_POINT_CLOUD,3.0f);     // last argument unused
+                obj->draw(renderer,QColor(255, 255, 255),3.0f);     // Changed to white (255,255,255)
                 break;
             case ST_KD_TREE:
                 obj->draw(renderer, QColor(100, 100, 255), 2.0f);  // draw kd-tree splitting planes
