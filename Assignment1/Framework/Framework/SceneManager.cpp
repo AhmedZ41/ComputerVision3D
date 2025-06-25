@@ -33,6 +33,10 @@ void SceneManager::draw(const RenderCamera& renderer, const QColor& color) const
             case ST_OCTREE:
                 obj->draw(renderer, QColor(255, 165, 0), 1.0f); // Orange color
                 break;
+            case ST_PCA_AXES:
+                obj->draw(renderer, QColor(255, 255, 0), 2.0f);  // Yellow for PCA axes
+                break;
+
 
 
 

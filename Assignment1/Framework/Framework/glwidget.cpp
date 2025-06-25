@@ -40,6 +40,11 @@
 #include "PointSet.h"
 #include "KDTree.h"
 #include "OctreeNode.h"
+#include "PCA.h"
+#include <Eigen/Dense>
+#include "PCAAxes.h"
+
+
 
 
 
@@ -206,6 +211,37 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         bunnyOct->setPointSize(unsigned(pointSize));
         sceneManager.push_back(bunnyOct);
 
+        // === Compute and print centroid ===
+        QVector4D centroid = PCA::computeCentroid(*bunnyOct);
+        qDebug() << "Centroid of bunny:" << centroid;
+
+        Eigen::Matrix3f cov = PCA::computeCovarianceMatrix(*bunnyOct, centroid);
+        qDebug() << "Covariance matrix:\n"
+                 << cov(0,0) << cov(0,1) << cov(0,2) << "\n"
+                 << cov(1,0) << cov(1,1) << cov(1,2) << "\n"
+                 << cov(2,0) << cov(2,1) << cov(2,2);
+
+
+        auto [eigenvectors, eigenvalues] = PCA::computeEigenvectorsAndValues(cov);
+        // Add visual representation of PCA axes as a SceneObject
+        auto* pcaAxes = new PCAAxes(centroid, eigenvectors);
+        sceneManager.push_back(pcaAxes);
+
+
+        qDebug() << "Eigenvalues:";
+        for (int i = 0; i < 3; ++i)
+            qDebug() << "λ[" << i << "] =" << eigenvalues(i);
+
+        qDebug() << "Eigenvectors (columns):";
+        for (int i = 0; i < 3; ++i) {
+            Eigen::Vector3f v = eigenvectors.col(i);
+            qDebug() << "v[" << i << "] =" << v(0) << v(1) << v(2);
+        }
+
+
+
+
+
         // Compute actual bounding box from scaled points
         QVector3D minCorner(std::numeric_limits<float>::max(),
                             std::numeric_limits<float>::max(),
@@ -231,6 +267,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         auto* octree = new OctreeNode(*bunnyOct, min, max);
         sceneManager.push_back(octree);
     }
+
 
 
 
