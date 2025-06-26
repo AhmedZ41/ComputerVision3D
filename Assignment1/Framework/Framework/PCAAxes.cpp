@@ -9,10 +9,27 @@ PCAAxes::PCAAxes(const QVector4D& centroid, const Eigen::Matrix3f& eigenvectors,
     type = SceneObjectType::ST_PCA_AXES;
 }
 
-void PCAAxes::draw(const RenderCamera& camera, const QColor&, float) const {
-    camera.renderLine(origin, origin + scale * directions[2], Qt::red);
-    camera.renderLine(origin, origin + scale * directions[1], Qt::green);
-    camera.renderLine(origin, origin + scale * directions[0], Qt::blue);
+void PCAAxes::draw(const RenderCamera& renderer, const QColor& color, float lineWidth) const {
+    // Use a much larger scaling factor for visibility
+    float axisLength = 0.5f;  // Increased from smaller value to make axes much longer
+    
+    // Draw each principal component axis with much increased thickness
+    for (int i = 0; i < 3; ++i) {
+        QVector4D direction = QVector4D(directions[i], 0.0f);
+        QVector4D originPoint = QVector4D(origin, 1.0f);  // Convert QVector3D to QVector4D
+        QVector4D endPoint = originPoint + axisLength * direction;
+        
+        // Use different colors for each axis for better distinction
+        QColor axisColor;
+        switch(i) {
+            case 0: axisColor = QColor(255, 0, 0);   break; // Red for 1st principal component
+            case 1: axisColor = QColor(0, 255, 0);   break; // Green for 2nd principal component  
+            case 2: axisColor = QColor(0, 0, 255);   break; // Blue for 3rd principal component
+        }
+        
+        // Draw with much increased line width (multiply by 4 for extra thickness)
+        renderer.renderLine(QVector3D(originPoint), QVector3D(endPoint), axisColor, lineWidth * 4.0f);
+    }
 }
 
 void PCAAxes::affineMap(const QMatrix4x4& m) {
