@@ -12,6 +12,8 @@ using enum SceneObjectType;
 //
 void SceneManager::draw(const RenderCamera& renderer, const QColor& color) const
 {
+    static int pointCloudCount = 0;  // Static counter to track which point cloud we're drawing
+    pointCloudCount = 0;  // Reset counter at start of each draw call
     for (auto obj : *this) if (obj) {
             switch (obj->getType()) {
             case ST_AXES:
@@ -25,16 +27,27 @@ void SceneManager::draw(const RenderCamera& renderer, const QColor& color) const
                 obj->draw(renderer,color,2.0f);
                 break;
             case ST_POINT_CLOUD:
-                obj->draw(renderer,QColor(255, 255, 255),3.0f);     // Changed to white (255,255,255)
+                {
+                    QColor pointCloudColor;
+                    switch(pointCloudCount) {
+                        case 0: pointCloudColor = QColor(255, 255, 255); break;  // 1st bunny: white (with KDTree)
+                        case 1: pointCloudColor = QColor(255, 255, 255); break;  // 2nd bunny: white (original)
+                        case 2: pointCloudColor = QColor(255, 255, 0);   break;  // 3rd bunny: yellow (transformed)
+                        case 3: pointCloudColor = QColor(255, 255, 0);   break;  // 4th bunny: yellow (aligned)
+                        default: pointCloudColor = QColor(255, 255, 255); break; // Default: white
+                    }
+                    obj->draw(renderer, pointCloudColor, 3.0f);
+                    pointCloudCount++;
+                }
                 break;
             case ST_KD_TREE:
-                obj->draw(renderer, QColor(100, 100, 255), 2.0f);  // draw kd-tree splitting planes
+                //obj->draw(renderer, QColor(100, 100, 255), 2.0f);  // draw kd-tree splitting planes
                 break;
             case ST_OCTREE:
-                obj->draw(renderer, QColor(255, 165, 0), 1.0f); // Orange color
+                //obj->draw(renderer, QColor(255, 165, 0), 1.0f); // Orange color
                 break;
             case ST_PCA_AXES:
-                obj->draw(renderer, QColor(255, 255, 0), 6.0f);
+                obj->draw(renderer, QColor(255, 255, 0), 1.0f);
                 break;
 
 

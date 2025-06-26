@@ -254,8 +254,8 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         // Apply a known transformation (rotation + translation)
         QMatrix4x4 knownTransform;
         knownTransform.setToIdentity();
-        knownTransform.rotate(30.0f, QVector3D(0, 1, 0));    // 30° rotation around Y-axis
-        knownTransform.translate(1.5f, 0.2f, 0.1f);          // Translation in X, Y, Z
+        knownTransform.rotate(20.0f, QVector3D(1, 1, 1));    // 30° rotation around Y-axis
+        knownTransform.translate(1.5f, 0.0f, 0.0f);          // Translation in X, Y, Z
         
         // Apply the transformation
         transformedBunny->affineMap(knownTransform);
@@ -301,6 +301,95 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         qDebug() << "\n=== PCA Alignment Data ===";
         qDebug() << "Original centroid:" << centroid;
         qDebug() << "Transformed centroid:" << transformedCentroid;
+
+                // ==========================================
+        // Part 2.3: Compute Rotation Matrix for Alignment
+        // ==========================================
+        
+        // Compute rotation matrix R_align = V_orig * V_transformed^T
+        Eigen::Matrix3f R_align = eigenvectors * transformedEigenvectors.transpose();
+        
+        qDebug() << "\n=== Alignment Rotation Matrix ===";
+        qDebug() << "R_align = V_orig * V_transformed^T";
+        qDebug() << "R_align:\n"
+                 << R_align(0,0) << R_align(0,1) << R_align(0,2) << "\n"
+                 << R_align(1,0) << R_align(1,1) << R_align(1,2) << "\n"
+                 << R_align(2,0) << R_align(2,1) << R_align(2,2);
+        
+        // Verify it's a proper rotation matrix (optional check)
+        Eigen::Matrix3f shouldBeIdentity = R_align * R_align.transpose();
+        float determinant = R_align.determinant();
+        qDebug() << "Determinant of R_align:" << determinant << "(should be ~1.0)";
+        qDebug() << "R * R^T (should be identity):\n"
+                 << shouldBeIdentity(0,0) << shouldBeIdentity(0,1) << shouldBeIdentity(0,2) << "\n"
+                 << shouldBeIdentity(1,0) << shouldBeIdentity(1,1) << shouldBeIdentity(1,2) << "\n"
+                 << shouldBeIdentity(2,0) << shouldBeIdentity(2,1) << shouldBeIdentity(2,2);
+
+        // ==========================================
+        // Part 2.4: Compute Translation Vector
+        // ==========================================
+        
+        // Convert centroids to Eigen vectors for computation
+        Eigen::Vector3f centroid_orig(centroid.x(), centroid.y(), centroid.z());
+        Eigen::Vector3f centroid_transformed(transformedCentroid.x(), transformedCentroid.y(), transformedCentroid.z());
+        
+        // Compute translation: T_align = centroid_original - R_align * centroid_transformed
+        Eigen::Vector3f T_align = centroid_orig - R_align * centroid_transformed;
+        
+        qDebug() << "\n=== Alignment Translation Vector ===";
+        qDebug() << "T_align = centroid_orig - R_align * centroid_transformed";
+        qDebug() << "T_align:" << T_align(0) << T_align(1) << T_align(2);
+
+
+        // ==========================================
+        // Part 2.5: Apply Inverse Transformation
+        // ==========================================
+        
+        // Build the 4x4 alignment transformation matrix
+        QMatrix4x4 alignmentMatrix;
+        alignmentMatrix.setToIdentity();
+        
+        // Set the rotation part (top-left 3x3)
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                alignmentMatrix(i, j) = R_align(i, j);
+            }
+        }
+        
+        // Set the translation part (top-right 3x1)
+        alignmentMatrix(0, 3) = T_align(0);
+        alignmentMatrix(1, 3) = T_align(1);
+        alignmentMatrix(2, 3) = T_align(2);
+        
+        qDebug() << "\n=== 4x4 Alignment Matrix ===";
+        qDebug() << "Alignment Matrix:";
+        for (int i = 0; i < 4; ++i) {
+            qDebug() << alignmentMatrix(i,0) << alignmentMatrix(i,1) << alignmentMatrix(i,2) << alignmentMatrix(i,3);
+        }
+        
+        // Create a copy of the transformed bunny for alignment
+        auto* alignedBunny = new PointCloud(*transformedBunny);
+        
+        // Apply the alignment transformation to bring it back to original position
+        alignedBunny->affineMap(alignmentMatrix);
+        
+        // Add to scene manager for visualization
+        sceneManager.push_back(alignedBunny);
+        
+        qDebug() << "\n=== Alignment Complete ===";
+        qDebug() << "Created aligned bunny - should now match the original bunny position";
+        qDebug() << "You should see 3 overlapping point clouds:";
+        qDebug() << "1. Original bunny (white)";
+        qDebug() << "2. Transformed bunny (white, displaced)";
+        qDebug() << "3. Aligned bunny (white, should overlap with original)";
+
+        // Compute centroid of aligned bunny to verify alignment
+        QVector4D alignedCentroid = PCA::computeCentroid(*alignedBunny);
+        qDebug() << "Original centroid:" << centroid;
+        qDebug() << "Aligned centroid:" << alignedCentroid;
+        qDebug() << "Difference:" << (centroid - alignedCentroid);
+  
+
 
 
 
@@ -366,22 +455,7 @@ void GLWidget::paintGL()
 {
     renderer->setup();
 
-    // Draw scene objects based on visibility flags
-    for (auto obj : sceneManager) {
-        // Skip KD-tree if not visible
-        if (obj->getType() == SceneObjectType::ST_KD_TREE && !showKDTree) {
-            continue;
-        }
-        // Skip Octree if not visible
-        if (obj->getType() == SceneObjectType::ST_OCTREE && !showOctree) {
-            continue;
-        }
-                if (obj->getType() == SceneObjectType::ST_PCA_AXES && !showPCAAxes) {
-            continue;
-        }
-        // Draw all other objects normally
-        obj->draw(*renderer, COLOR_SCENE, 1.0f);
-    }
+    sceneManager.draw(*renderer, COLOR_SCENE);
 }
 
 //

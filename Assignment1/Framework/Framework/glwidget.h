@@ -20,7 +20,7 @@ private:
     SceneManager  sceneManager;
     bool          showKDTree = false;
     bool          showOctree = false;
-    bool showPCAAxes = true;
+    bool          showPCAAxes = true;
 
 public:
     GLWidget(QWidget* parent = nullptr);
