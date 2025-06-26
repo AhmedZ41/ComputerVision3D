@@ -32,6 +32,7 @@ public slots:
     void checkBoxClicked();        // handle check boxes
     void spinBoxValueChanged(int); // handles spin  boxes changes
     void setPointSize(int);
+    void setBBoxDepth(int);
 
 protected:
     // painting the canvas

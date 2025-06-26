@@ -289,7 +289,7 @@ void KDTree::calculatePointsBounds(const std::vector<QVector4D> &points,
     }
 
     // Add a buffer to ensure points are enclosed
-    float bufferPercent = 0.05f; // 5% buffer for better visibility
+    float bufferPercent = 0.001f; // 0.1% buffer for better visibility
     QVector3D dimensions = outMax - outMin;
     QVector3D buffer = dimensions * bufferPercent;
 
@@ -464,6 +464,19 @@ void KDTree::draw(const RenderCamera &renderer, const QColor &color, float trans
         renderer.renderLine(corners[1], corners[5], levelColor, lineWidth);
         renderer.renderLine(corners[2], corners[6], levelColor, lineWidth);
         renderer.renderLine(corners[3], corners[7], levelColor, lineWidth);
+
+        // Fill the box faces with a semi-transparent color
+        QColor fillColor = levelColor;
+        fillColor.setAlpha(40); // Lower alpha for fill
+        // Bottom face
+        renderer.renderPlane(corners[0], corners[1], corners[2], corners[3], fillColor, 0.15f);
+        // Top face
+        renderer.renderPlane(corners[4], corners[5], corners[6], corners[7], fillColor, 0.15f);
+        // Sides
+        renderer.renderPlane(corners[0], corners[1], corners[5], corners[4], fillColor, 0.15f);
+        renderer.renderPlane(corners[1], corners[2], corners[6], corners[5], fillColor, 0.15f);
+        renderer.renderPlane(corners[2], corners[3], corners[7], corners[6], fillColor, 0.15f);
+        renderer.renderPlane(corners[3], corners[0], corners[4], corners[7], fillColor, 0.15f);
     }
 }
 

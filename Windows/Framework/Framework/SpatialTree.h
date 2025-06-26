@@ -44,19 +44,13 @@ protected:
     // Helper function to get color based on level
     QColor getLevelColor(int level) const
     {
-        switch (level)
-        {
-        case 0:
-            return QColor(0, 220, 220, 80); // Cyan for level 0
-        case 1:
-            return QColor(220, 50, 100, 150); // Red/pink for level 1
-        case 2:
-            return QColor(50, 220, 50, 170); // Green for level 2
-        case 3:
-            return QColor(220, 220, 50, 190); // Yellow for level 3
-        default:
-            return QColor(150, 150, 220, 200); // Blue for deeper levels
-        }
+        // Generate a unique color for each level using HSV color wheel
+        // Hue cycles through 0-359, saturation and value are fixed for visibility
+        int hue = (level * 47) % 360;         // 47 is a prime to avoid repetition for small levels
+        int sat = 200;                        // out of 255
+        int val = 220;                        // out of 255
+        int alpha = 120 + (level * 20) % 136; // Vary alpha for some transparency
+        return QColor::fromHsv(hue, sat, val, alpha);
     }
 };
 

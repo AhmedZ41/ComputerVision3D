@@ -84,7 +84,7 @@ void GLWidget::loadModel(const QString &path)
 {
     auto *pointCloud = new PointCloud();
 
-    pointCloud->setTreeType(PointCloud::TreeType::KD);
+    pointCloud->setTreeType(PointCloud::TreeType::OCT);
 
     QString modelPath = path;
     QFileInfo info(modelPath);
@@ -141,8 +141,8 @@ void GLWidget::initializeGL()
 //
 void GLWidget::paintGL()
 {
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);                                       // dunkles Grau
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // ← Wichtig!
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     renderer->setup();
 
@@ -364,4 +364,27 @@ void GLWidget::checkBoxClicked()
 void GLWidget::spinBoxValueChanged(int)
 {
     QMessageBox::warning(this, "Feature", "ups hier fehlt noch was");
+}
+
+void GLWidget::setBBoxDepth(int depth)
+{
+    for (auto s : sceneManager)
+    {
+        if (s->getType() == SceneObjectType::ST_TREE)
+        {
+            auto *tree = dynamic_cast<SpatialTree *>(s);
+            if (tree)
+                tree->setVisualizationLevel(depth);
+        }
+        // Optionally, update PointCloud's spatial tree as well
+        if (s->getType() == SceneObjectType::ST_POINT_CLOUD)
+        {
+            auto *pc = dynamic_cast<PointCloud *>(s);
+            if (pc && pc->getSpatialTree())
+            {
+                pc->getSpatialTree()->setVisualizationLevel(depth);
+            }
+        }
+    }
+    update();
 }
