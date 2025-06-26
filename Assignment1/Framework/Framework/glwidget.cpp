@@ -40,6 +40,11 @@
 #include "PointSet.h"
 #include "KDTree.h"
 #include "OctreeNode.h"
+#include "PCA.h"
+#include <Eigen/Dense>
+#include "PCAAxes.h"
+
+
 
 
 
@@ -59,7 +64,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     connect(renderer, &RenderCamera::changed, this, &GLWidget::onRendererChanged);
 
     // setup the scene
-    sceneManager.push_back(new Axes(E0,QMatrix4x4()));    // the global world coordinate system
+    //sceneManager.push_back(new Axes(E0,QMatrix4x4()));    // the global world coordinate system
     // sceneManager.push_back(new Plane(E0+4*E3,-E3));       // some plane
 
     // TODO: Assignment 1, Part 1
@@ -79,6 +84,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //       Its draw-method should draw all relevant camera parameters, e.g. image plane, view axes, etc
 
     //
+    /*
     auto cam = new PerspectiveCamera(E0 + 2*E1+ 1*E3,
                                      QVector3D(0, 0, -1),
                                      QVector3D(0, 1, 0),
@@ -86,20 +92,21 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
                                      1.5f, 1.5f);
 
     sceneManager.push_back(cam);
+    */
 
     // TODO: Assignement 1, Part 3
     //       Add to your perspective camera methods to project the other scene objects onto its image plane
     //       and to draw the projected objects. These methods have to be invoked in Scene.cpp/Scene::draw.
     //
 
-
+/*
     // Add all existing cubes to camera for projection
     for (auto s : sceneManager) {
         if (s->getType() == SceneObjectType::ST_CUBE) {
             cam->addCube(*reinterpret_cast<Cube*>(s));
         }
     }
-
+*/
 
     // TODO: Assignement 2, Part 1 - 3
     //       Add here your own new scene object that represents a stereo camera pair.
@@ -112,6 +119,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     //
 
     // === Add second perspective camera ===
+    /*
     auto cam2 = new PerspectiveCamera(
         E0 - 1*E1 + 1*E3,                // position
         QVector3D(0, 0, -1),             // view direction
@@ -119,11 +127,11 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         2.0f, 1.5f, 1.5f                 // focal length, image plane size
         );
     sceneManager.push_back(cam2);
-
+*/
 
 
     // === Simulate camera misalignment (Part 3) ===
-
+/*
     QMatrix4x4 rotation;
     rotation.setToIdentity();
     rotation.rotate(0.0f, QVector3D(0, 0, 0)); // 15° rotation around Y-axis
@@ -139,7 +147,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
             cam2->addCube(*reinterpret_cast<Cube*>(s));
     }
 
-
+*/
 
 
     // === Manual triangulation & display (used for debugging) ===
@@ -169,6 +177,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
     stereo->reconstructFromStereo();
     sceneManager.push_back(stereo);
 */
+/*
     auto stereo = new StereoCamera(cam, cam2);
     stereo->reconstructFromStereo(0.0f); // 1° error
     sceneManager.push_back(stereo);
@@ -178,6 +187,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         if (s->getType() == SceneObjectType::ST_CUBE)
             cam2->addCube(*reinterpret_cast<Cube*>(s));
     }
+            */
 
     // ==== Load bunny and encapsulated KDTree into scene ====
     auto* bunny = new PointCloud();
@@ -202,9 +212,186 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
 
     // === Load bunny and build Octree ===
     auto* bunnyOct = new PointCloud();
+    
     if (bunnyOct->loadPLY("/Users/ahmedadnan/Desktop/HTWG/S6/Computervision-3D/ComputerVision3D/Assignment1/Framework/data/bunny.ply")) {
         bunnyOct->setPointSize(unsigned(pointSize));
         sceneManager.push_back(bunnyOct);
+
+        // === Compute and print centroid ===
+        QVector4D centroid = PCA::computeCentroid(*bunnyOct);
+        qDebug() << "Centroid of bunny:" << centroid;
+
+        Eigen::Matrix3f cov = PCA::computeCovarianceMatrix(*bunnyOct, centroid);
+        qDebug() << "Covariance matrix:\n"
+                 << cov(0,0) << cov(0,1) << cov(0,2) << "\n"
+                 << cov(1,0) << cov(1,1) << cov(1,2) << "\n"
+                 << cov(2,0) << cov(2,1) << cov(2,2);
+
+
+        auto [eigenvectors, eigenvalues] = PCA::computeEigenvectorsAndValues(cov);
+        // Add visual representation of PCA axes as a SceneObject
+        auto* pcaAxes = new PCAAxes(centroid, eigenvectors);
+        sceneManager.push_back(pcaAxes);
+
+
+        qDebug() << "Eigenvalues:";
+        for (int i = 0; i < 3; ++i)
+            qDebug() << "λ[" << i << "] =" << eigenvalues(i);
+
+        qDebug() << "Eigenvectors (columns):";
+        for (int i = 0; i < 3; ++i) {
+            Eigen::Vector3f v = eigenvectors.col(i);
+            qDebug() << "v[" << i << "] =" << v(0) << v(1) << v(2);
+        }
+
+        // ==========================================
+        // Part 2.1: Create Transformed Bunny
+        // ==========================================
+        
+        // Create a copy of the original bunny
+        auto* transformedBunny = new PointCloud(*bunnyOct);  // Copy constructor
+        
+        // Apply a known transformation (rotation + translation)
+        QMatrix4x4 knownTransform;
+        knownTransform.setToIdentity();
+        knownTransform.rotate(20.0f, QVector3D(1, 1, 1));    // 30° rotation around Y-axis
+        knownTransform.translate(1.5f, 0.0f, 0.0f);          // Translation in X, Y, Z
+        
+        // Apply the transformation
+        transformedBunny->affineMap(knownTransform);
+        
+        // Add to scene manager (this will be drawn in a different color via SceneManager)
+        sceneManager.push_back(transformedBunny);
+        
+        qDebug() << "Created transformed bunny with rotation 30° around Y + translation (0.5, 0.2, 0.1)";
+
+// ==========================================
+        // Part 2.2: Compute PCA on Transformed Bunny
+        // ==========================================
+        
+        // Compute centroid of transformed bunny
+        QVector4D transformedCentroid = PCA::computeCentroid(*transformedBunny);
+        qDebug() << "Centroid of transformed bunny:" << transformedCentroid;
+        
+        // Compute covariance matrix of transformed bunny
+        Eigen::Matrix3f transformedCov = PCA::computeCovarianceMatrix(*transformedBunny, transformedCentroid);
+        qDebug() << "Transformed covariance matrix:\n"
+                 << transformedCov(0,0) << transformedCov(0,1) << transformedCov(0,2) << "\n"
+                 << transformedCov(1,0) << transformedCov(1,1) << transformedCov(1,2) << "\n"
+                 << transformedCov(2,0) << transformedCov(2,1) << transformedCov(2,2);
+
+        // Compute eigenvectors and eigenvalues of transformed bunny
+        auto [transformedEigenvectors, transformedEigenvalues] = PCA::computeEigenvectorsAndValues(transformedCov);
+        
+        // Add visual representation of transformed PCA axes
+        auto* transformedPCAAxes = new PCAAxes(transformedCentroid, transformedEigenvectors);
+        sceneManager.push_back(transformedPCAAxes);
+
+        qDebug() << "Transformed Eigenvalues:";
+        for (int i = 0; i < 3; ++i)
+            qDebug() << "λ_transformed[" << i << "] =" << transformedEigenvalues(i);
+
+        qDebug() << "Transformed Eigenvectors (columns):";
+        for (int i = 0; i < 3; ++i) {
+            Eigen::Vector3f v = transformedEigenvectors.col(i);
+            qDebug() << "v_transformed[" << i << "] =" << v(0) << v(1) << v(2);
+        }
+
+        // Store variables for next steps
+        qDebug() << "\n=== PCA Alignment Data ===";
+        qDebug() << "Original centroid:" << centroid;
+        qDebug() << "Transformed centroid:" << transformedCentroid;
+
+                // ==========================================
+        // Part 2.3: Compute Rotation Matrix for Alignment
+        // ==========================================
+        
+        // Compute rotation matrix R_align = V_orig * V_transformed^T
+        Eigen::Matrix3f R_align = eigenvectors * transformedEigenvectors.transpose();
+        
+        qDebug() << "\n=== Alignment Rotation Matrix ===";
+        qDebug() << "R_align = V_orig * V_transformed^T";
+        qDebug() << "R_align:\n"
+                 << R_align(0,0) << R_align(0,1) << R_align(0,2) << "\n"
+                 << R_align(1,0) << R_align(1,1) << R_align(1,2) << "\n"
+                 << R_align(2,0) << R_align(2,1) << R_align(2,2);
+        
+        // Verify it's a proper rotation matrix (optional check)
+        Eigen::Matrix3f shouldBeIdentity = R_align * R_align.transpose();
+        float determinant = R_align.determinant();
+        qDebug() << "Determinant of R_align:" << determinant << "(should be ~1.0)";
+        qDebug() << "R * R^T (should be identity):\n"
+                 << shouldBeIdentity(0,0) << shouldBeIdentity(0,1) << shouldBeIdentity(0,2) << "\n"
+                 << shouldBeIdentity(1,0) << shouldBeIdentity(1,1) << shouldBeIdentity(1,2) << "\n"
+                 << shouldBeIdentity(2,0) << shouldBeIdentity(2,1) << shouldBeIdentity(2,2);
+
+        // ==========================================
+        // Part 2.4: Compute Translation Vector
+        // ==========================================
+        
+        // Convert centroids to Eigen vectors for computation
+        Eigen::Vector3f centroid_orig(centroid.x(), centroid.y(), centroid.z());
+        Eigen::Vector3f centroid_transformed(transformedCentroid.x(), transformedCentroid.y(), transformedCentroid.z());
+        
+        // Compute translation: T_align = centroid_original - R_align * centroid_transformed
+        Eigen::Vector3f T_align = centroid_orig - R_align * centroid_transformed;
+        
+        qDebug() << "\n=== Alignment Translation Vector ===";
+        qDebug() << "T_align = centroid_orig - R_align * centroid_transformed";
+        qDebug() << "T_align:" << T_align(0) << T_align(1) << T_align(2);
+
+
+        // ==========================================
+        // Part 2.5: Apply Inverse Transformation
+        // ==========================================
+        
+        // Build the 4x4 alignment transformation matrix
+        QMatrix4x4 alignmentMatrix;
+        alignmentMatrix.setToIdentity();
+        
+        // Set the rotation part (top-left 3x3)
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                alignmentMatrix(i, j) = R_align(i, j);
+            }
+        }
+        
+        // Set the translation part (top-right 3x1)
+        alignmentMatrix(0, 3) = T_align(0);
+        alignmentMatrix(1, 3) = T_align(1);
+        alignmentMatrix(2, 3) = T_align(2);
+        
+        qDebug() << "\n=== 4x4 Alignment Matrix ===";
+        qDebug() << "Alignment Matrix:";
+        for (int i = 0; i < 4; ++i) {
+            qDebug() << alignmentMatrix(i,0) << alignmentMatrix(i,1) << alignmentMatrix(i,2) << alignmentMatrix(i,3);
+        }
+        
+        // Create a copy of the transformed bunny for alignment
+        auto* alignedBunny = new PointCloud(*transformedBunny);
+        
+        // Apply the alignment transformation to bring it back to original position
+        alignedBunny->affineMap(alignmentMatrix);
+        
+        // Add to scene manager for visualization
+        sceneManager.push_back(alignedBunny);
+        
+        qDebug() << "\n=== Alignment Complete ===";
+        qDebug() << "Created aligned bunny - should now match the original bunny position";
+        qDebug() << "You should see 3 overlapping point clouds:";
+        qDebug() << "1. Original bunny (white)";
+        qDebug() << "2. Transformed bunny (white, displaced)";
+        qDebug() << "3. Aligned bunny (white, should overlap with original)";
+
+        // Compute centroid of aligned bunny to verify alignment
+        QVector4D alignedCentroid = PCA::computeCentroid(*alignedBunny);
+        qDebug() << "Original centroid:" << centroid;
+        qDebug() << "Aligned centroid:" << alignedCentroid;
+        qDebug() << "Difference:" << (centroid - alignedCentroid);
+  
+
+
+
 
         // Compute actual bounding box from scaled points
         QVector3D minCorner(std::numeric_limits<float>::max(),
@@ -231,6 +418,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
         auto* octree = new OctreeNode(*bunnyOct, min, max);
         sceneManager.push_back(octree);
     }
+
 
 
 
@@ -267,19 +455,7 @@ void GLWidget::paintGL()
 {
     renderer->setup();
 
-    // Draw scene objects based on visibility flags
-    for (auto obj : sceneManager) {
-        // Skip KD-tree if not visible
-        if (obj->getType() == SceneObjectType::ST_KD_TREE && !showKDTree) {
-            continue;
-        }
-        // Skip Octree if not visible
-        if (obj->getType() == SceneObjectType::ST_OCTREE && !showOctree) {
-            continue;
-        }
-        // Draw all other objects normally
-        obj->draw(*renderer, COLOR_SCENE, 1.0f);
-    }
+    sceneManager.draw(*renderer, COLOR_SCENE);
 }
 
 //
@@ -335,6 +511,10 @@ void GLWidget::keyPressEvent(QKeyEvent * event)
     case Key_O:
         showOctree = !showOctree;
         showKDTree = false;  // Ensure only one visualization is active
+        break;
+        // Toggle PCA axes with 'p'
+    case Key_P:
+        showPCAAxes = !showPCAAxes;
         break;
         // trigger translation of renderer using keyboard
     case Key_4:

@@ -35,6 +35,8 @@ HEADERS += ./glwidget.h \
     KDTree.h \
     KDUtils.h \
     OctreeNode.h \
+    PCA.h \
+    PCAAxes.h \
     Plane.h \
     PointSet.h \
     RenderCamera.h \
@@ -57,6 +59,8 @@ SOURCES += ./glwidget.cpp \
     KDTree.cpp \
     KDUtils.cpp \
     OctreeNode.cpp \
+    PCA.cpp \
+    PCAAxes.cpp \
     Plane.cpp \
     PointSet.cpp \
     RenderCamera.cpp \
@@ -66,3 +70,5 @@ SOURCES += ./glwidget.cpp \
     perspectivecamera.cpp
 
 FORMS += ./mainwindow.ui
+
+INCLUDEPATH += $$PWD/external/eigen-3.4.0

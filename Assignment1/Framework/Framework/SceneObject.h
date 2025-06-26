@@ -14,7 +14,7 @@
 // some predefined colors
 [[maybe_unused]] const QColor COLOR_AXES           = QColor(255,  0,  0);
 [[maybe_unused]] const QColor COLOR_PLANE          = QColor(255,255,  0);
-[[maybe_unused]] const QColor COLOR_SCENE          = QColor(  0,255,  0);
+[[maybe_unused]] const QColor COLOR_SCENE          = QColor(  255,255,  255);
 [[maybe_unused]] const QColor COLOR_RECONSTRUCTION = QColor(255,  0,  0);
 [[maybe_unused]] const QColor COLOR_CAMERA         = QColor(255,  0,  0);
 [[maybe_unused]] const QColor COLOR_POINT_CLOUD    = QColor(255,255,255);
@@ -30,6 +30,7 @@ enum class SceneObjectType {ST_NONE                     [[maybe_unused]],   //
                             ST_KD_TREE                  [[maybe_unused]],   // stereo cameras
                             ST_POINT_CLOUD              [[maybe_unused]],   // point cloud
                             ST_OCTREE                   [[maybe_unused]],   // point cloud
+                            ST_PCA_AXES                   [[maybe_unused]],   // point cloud
                             ST_MaxSceneType             [[maybe_unused]]};
 
 
