@@ -212,6 +212,7 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
 
     // === Load bunny and build Octree ===
     auto* bunnyOct = new PointCloud();
+    
     if (bunnyOct->loadPLY("/Users/ahmedadnan/Desktop/HTWG/S6/Computervision-3D/ComputerVision3D/Assignment1/Framework/data/bunny.ply")) {
         bunnyOct->setPointSize(unsigned(pointSize));
         sceneManager.push_back(bunnyOct);
@@ -243,7 +244,63 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent), pointSize(5)
             qDebug() << "v[" << i << "] =" << v(0) << v(1) << v(2);
         }
 
+        // ==========================================
+        // Part 2.1: Create Transformed Bunny
+        // ==========================================
+        
+        // Create a copy of the original bunny
+        auto* transformedBunny = new PointCloud(*bunnyOct);  // Copy constructor
+        
+        // Apply a known transformation (rotation + translation)
+        QMatrix4x4 knownTransform;
+        knownTransform.setToIdentity();
+        knownTransform.rotate(30.0f, QVector3D(0, 1, 0));    // 30° rotation around Y-axis
+        knownTransform.translate(1.5f, 0.2f, 0.1f);          // Translation in X, Y, Z
+        
+        // Apply the transformation
+        transformedBunny->affineMap(knownTransform);
+        
+        // Add to scene manager (this will be drawn in a different color via SceneManager)
+        sceneManager.push_back(transformedBunny);
+        
+        qDebug() << "Created transformed bunny with rotation 30° around Y + translation (0.5, 0.2, 0.1)";
 
+// ==========================================
+        // Part 2.2: Compute PCA on Transformed Bunny
+        // ==========================================
+        
+        // Compute centroid of transformed bunny
+        QVector4D transformedCentroid = PCA::computeCentroid(*transformedBunny);
+        qDebug() << "Centroid of transformed bunny:" << transformedCentroid;
+        
+        // Compute covariance matrix of transformed bunny
+        Eigen::Matrix3f transformedCov = PCA::computeCovarianceMatrix(*transformedBunny, transformedCentroid);
+        qDebug() << "Transformed covariance matrix:\n"
+                 << transformedCov(0,0) << transformedCov(0,1) << transformedCov(0,2) << "\n"
+                 << transformedCov(1,0) << transformedCov(1,1) << transformedCov(1,2) << "\n"
+                 << transformedCov(2,0) << transformedCov(2,1) << transformedCov(2,2);
+
+        // Compute eigenvectors and eigenvalues of transformed bunny
+        auto [transformedEigenvectors, transformedEigenvalues] = PCA::computeEigenvectorsAndValues(transformedCov);
+        
+        // Add visual representation of transformed PCA axes
+        auto* transformedPCAAxes = new PCAAxes(transformedCentroid, transformedEigenvectors);
+        sceneManager.push_back(transformedPCAAxes);
+
+        qDebug() << "Transformed Eigenvalues:";
+        for (int i = 0; i < 3; ++i)
+            qDebug() << "λ_transformed[" << i << "] =" << transformedEigenvalues(i);
+
+        qDebug() << "Transformed Eigenvectors (columns):";
+        for (int i = 0; i < 3; ++i) {
+            Eigen::Vector3f v = transformedEigenvectors.col(i);
+            qDebug() << "v_transformed[" << i << "] =" << v(0) << v(1) << v(2);
+        }
+
+        // Store variables for next steps
+        qDebug() << "\n=== PCA Alignment Data ===";
+        qDebug() << "Original centroid:" << centroid;
+        qDebug() << "Transformed centroid:" << transformedCentroid;
 
 
 
