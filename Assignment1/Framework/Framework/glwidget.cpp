@@ -319,6 +319,9 @@ void GLWidget::paintGL()
         if (obj->getType() == SceneObjectType::ST_OCTREE && !showOctree) {
             continue;
         }
+                if (obj->getType() == SceneObjectType::ST_PCA_AXES && !showPCAAxes) {
+            continue;
+        }
         // Draw all other objects normally
         obj->draw(*renderer, COLOR_SCENE, 1.0f);
     }
@@ -377,6 +380,10 @@ void GLWidget::keyPressEvent(QKeyEvent * event)
     case Key_O:
         showOctree = !showOctree;
         showKDTree = false;  // Ensure only one visualization is active
+        break;
+        // Toggle PCA axes with 'p'
+    case Key_P:
+        showPCAAxes = !showPCAAxes;
         break;
         // trigger translation of renderer using keyboard
     case Key_4:
